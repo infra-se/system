@@ -1,6 +1,5 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
-SCRIPT_VERSION=0.1.20220613
 DESCRIPTION="github PR branch Delete."
 
 export LANG=C
