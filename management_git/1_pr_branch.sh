@@ -1,6 +1,5 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
-SCRIPT_VERSION=0.1.20220613
 DESCRIPTION="github New branch Source Commit"
 
 export LANG=C
