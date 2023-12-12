@@ -31,7 +31,7 @@ export LANG=C
 export LC_ALL=C
 
 ```
-6. Edit INVENTORY/work.hosts File
+7. Edit INVENTORY/work.hosts File
 ```
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ 
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ vi INVENTORY/work.hosts 
@@ -43,7 +43,7 @@ export LC_ALL=C
 192.168.137.50 
 ```
 
-7. Open check_ansible_env.sh and edit the ANSIBLE_ACCOUNT variable.
+8. Open check_ansible_env.sh and edit the ANSIBLE_ACCOUNT variable.
 ```
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ vi check_ansible_env.sh 
 #!/bin/bash
@@ -58,7 +58,7 @@ ANSIBLE_TARGET_GROUP=TARGET_LIST
 
 ```
 
-8. Execute the Ansible confirmation script as shown below.
+9. Execute the Ansible confirmation script as shown below.
 ```
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ 
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ ./check_ansible_env.sh 
@@ -70,7 +70,7 @@ ANSIBLE_TARGET_GROUP=TARGET_LIST
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ 
 ```
 
-9. Once the ansible environment check is complete, run the CI collection Main script as shown below.
+10. Once the ansible environment check is complete, run the CI collection Main script as shown below.
 ```
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ 
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ ./ci_collect.sh 
