@@ -1,7 +1,7 @@
 # This Directory is Ansible Script Top Path.
 [ Usage ]
 
-1. Create Ansible Account or Login Ansible Account. (ex : su - ansadm)
+1. Create Ansible Account or Login Ansible Account. (ex : su - helperchoi)
 2. wget -O - https://github.com/infra-se/system/blob/main/ANSIBLE_SCRIPT/get_script.sh?raw=true | bash
 3. cd ~/ANSIBLE_SCRIPT
 4. Configure ansible.cfg or Delete ansible.cfg
