@@ -12,7 +12,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_VER=0.3.20231212
-ANSIBLE_ACCOUNT=ansadm
+ANSIBLE_ACCOUNT=helperchoi
 ANSIBLE_TARGET_GROUP=TARGET_LIST
 
 export LANG=C
@@ -111,9 +111,9 @@ ok: [192.168.137.10] => {
         "[CHECK_RESULT] CI_SHEET_02|centos01|VirtualBox|/boot|555:root:root|/dev/sda1|xfs|0.990234|part|143|65|2.2", 
         "[CHECK_RESULT] CI_SHEET_02|centos01|VirtualBox|/nfs_vol|700:root:root|/dev/sdc|ext4|4.79688|disk|20|65|0.307692", 
         "[CHECK_RESULT] CI_SHEET_03|centos01|helperchoi|1000|1000|1000 10|/home/helperchoi|/bin/bash", 
-        "[CHECK_RESULT] CI_SHEET_03|centos01|ansadm|1001|1001|1001|/home/ansadm|/bin/bash", 
+        "[CHECK_RESULT] CI_SHEET_03|centos01|helperchoi|1001|1001|1001|/home/helperchoi|/bin/bash", 
         "[CHECK_RESULT] CI_SHEET_03|centos01|helperchoi|1002|1002|1002|/home/helperchoi|/bin/bash", 
-        "[CHECK_RESULT] CI_SHEET_03|centos01|ansadm-sec|4001|4001|4001|/home/ansadm-sec|/bin/bash", 
+        "[CHECK_RESULT] CI_SHEET_03|centos01|helperchoi-sec|4001|4001|4001|/home/helperchoi-sec|/bin/bash", 
         "[CHECK_RESULT] CI_SHEET_04|centos01|root|/usr/lib/systemd/systemd --switched-root --system --deserialize 22 ", 
         "[CHECK_RESULT] CI_SHEET_04|centos01|root|[kthreadd] ", 
         "[CHECK_RESULT] CI_SHEET_04|centos01|root|[kworker/0:0H] ", 
@@ -399,7 +399,7 @@ ok: [192.168.137.20] => {
         "[CHECK_RESULT] CI_SHEET_02|centos02|VirtualBox|/nvme_disk|755:root:root|/dev/nvme0n1|ext4|1.90625|disk|6|25|0.24", 
         "[CHECK_RESULT] CI_SHEET_02|centos02|VirtualBox|/ISCSI_DISK|755:root:root|/dev/sdd|ext4|9.71875|disk|37|25|1.48", 
         "[CHECK_RESULT] CI_SHEET_03|centos02|helperchoi|1000|1000|1000 10|/home/helperchoi|/bin/bash", 
-        "[CHECK_RESULT] CI_SHEET_03|centos02|ansadm|1001|1001|1001|/home/ansadm|/bin/bash", 
+        "[CHECK_RESULT] CI_SHEET_03|centos02|helperchoi|1001|1001|1001|/home/helperchoi|/bin/bash", 
         "[CHECK_RESULT] CI_SHEET_03|centos02|helperchoi|1002|1002|1002 10|/home/helperchoi|/bin/bash", 
         "[CHECK_RESULT] CI_SHEET_04|centos02|root|/usr/lib/systemd/systemd --switched-root --system --deserialize 22 ", 
         "[CHECK_RESULT] CI_SHEET_04|centos02|root|[kthreadd] ", 
@@ -788,12 +788,12 @@ rhel01    VirtualBox  /boot        555:root:root  /dev/sda1                     
 ### CREATE CI SHEET 03 - /home/helperchoi/ANSIBLE_SCRIPT/CI_RESULT/ci_03.log ###
 [HOSTNAME]  [ACCOUNT]  [UID]  [GID]  [GIDs]  [Home  DIR]  [ANSIBLE_SCRIPT]
 centos01  helperchoi  1000  1000  1000 10  /home/helperchoi  /bin/bash 
-centos01  ansadm      1001  1001  1001     /home/ansadm      /bin/bash 
+centos01  helperchoi      1001  1001  1001     /home/helperchoi      /bin/bash 
 centos01  helperchoi      1002  1002  1002     /home/helperchoi      /bin/bash 
-centos01  ansadm-sec  4001  4001  4001     /home/ansadm-sec  /bin/bash 
+centos01  helperchoi-sec  4001  4001  4001     /home/helperchoi-sec  /bin/bash 
 centos03  helperchoi      500   500   500      /home/helperchoi      /bin/bash 
 centos02  helperchoi  1000  1000  1000 10  /home/helperchoi  /bin/bash 
-centos02  ansadm      1001  1001  1001     /home/ansadm      /bin/bash 
+centos02  helperchoi      1001  1001  1001     /home/helperchoi      /bin/bash 
 centos02  helperchoi      1002  1002  1002 10  /home/helperchoi      /bin/bash 
 rhel02    helperchoi      1000  1000  1000 10  /home/helperchoi      /bin/bash 
 rhel01    helperchoi      500   500   500      /home/helperchoi      /bin/bash 
