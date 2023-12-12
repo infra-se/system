@@ -25,5 +25,7 @@ else
 	echo "ANSIBLE_SCRIPT" > .git/info/sparse-checkout
 	git pull origin main
 	chmod -R 750 ./ANSIBLE_SCRIPT
+ 	cd ~
+  	pwd
 	ls -l ./ANSIBLE_SCRIPT
 fi
