@@ -16,6 +16,7 @@ else
 	echo
 	echo "[INFO] Download the Ansible script to the top path under the user account."
 	echo "(ex : /home/ANSIBLE_ACCOUNT/ANSIBLE_SCRIPT)"
+ 	echo
 
 	cd ~
 	rm -rf .git ./ANSIBLE_SCRIPT
@@ -25,7 +26,8 @@ else
 	echo "ANSIBLE_SCRIPT" > .git/info/sparse-checkout
 	git pull origin main
 	chmod -R 750 ./ANSIBLE_SCRIPT
- 	cd ~
-  	pwd
+ 	echo
+  	echo "[INFO] Ansible Script Path : /home/${USER}/ANSIBLE_SCRIPT"
+  	echo
 	ls -l ./ANSIBLE_SCRIPT
 fi
