@@ -10,7 +10,7 @@ export LC_ALL=C
 if [ $# -ne 1 ]
 then
 	echo
-	echo "### 1. Edit Inventory File  : vi /home/${ANSIBLE_ACCOUNT}/shell/INVENTORY/work.hosts or prod.hosts ###"
+	echo "### 1. Edit Inventory File  : vi /home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/INVENTORY/work.hosts or prod.hosts ###"
 	echo "### 2. Select Group Name : WORK_LIST, PROD_LIST ###"
 	echo
 	echo "Usage ex) : $0 WORK_LIST or PROD_LIST"
@@ -22,12 +22,12 @@ fi
 #### COMMON VARS ####
 #####################
 
-ANSIBLE_INVENTORY_DIR=/home/${ANSIBLE_ACCOUNT}/shell/INVENTORY
-ANSIBLE_SUB_SHELL_DIR=/home/${ANSIBLE_ACCOUNT}/shell/SUB_SCRIPT
-ANSIBLE_YAML_DIR=/home/${ANSIBLE_ACCOUNT}/shell/YAML
+ANSIBLE_INVENTORY_DIR=/home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/INVENTORY
+ANSIBLE_SUB_ANSIBLE_SCRIPT_DIR=/home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/SUB_SCRIPT
+ANSIBLE_YAML_DIR=/home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/YAML
 ANSIBLE_SCRIPT_NAME=ci_collect
 
-FINAL_RESULT_PATH=/home/${ANSIBLE_ACCOUNT}/shell/CI_RESULT
+FINAL_RESULT_PATH=/home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/CI_RESULT
 ANSIBLE_RAW_LOG=${FINAL_RESULT_PATH}/ansible_raw.log
 TMP_RESULT_LOG=${FINAL_RESULT_PATH}/ci_collect_raw.log
 CI_LOG_01=${FINAL_RESULT_PATH}/ci_01.log
@@ -121,7 +121,7 @@ FUNCT_PRINT_RESULT() {
 
 	echo
 	echo "### CREATE CI SHEET 03 - ${CI_LOG_03} ###"
-	echo "[HOSTNAME] [ACCOUNT] [UID] [GID] [GIDs] [Home DIR] [Shell]" | column -t
+	echo "[HOSTNAME] [ACCOUNT] [UID] [GID] [GIDs] [Home DIR] [ANSIBLE_SCRIPT]" | column -t
 	FUNCT_CREATE_SHEET_FILE_03 | tee ${CI_LOG_03} | column -t -s "|"
 	echo
 
