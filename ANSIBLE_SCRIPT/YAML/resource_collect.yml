@@ -6,8 +6,8 @@
   become: yes  
   vars:
     ansible_account: "{{ vars_ansible_account }}"
-    src_path: /home/{{ ansible_account }}/shell/SUB_SCRIPT
-    dst_path: /home/{{ ansible_account }}/shell/SUB_SCRIPT
+    src_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/SUB_SCRIPT
+    dst_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/SUB_SCRIPT
   
   tasks:
     - name: "Check Script Dir - {{dst_path}} : Progress 5%"
