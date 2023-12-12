@@ -9,7 +9,7 @@ ANSIBLE_ACCOUNT=ansadm
 ANSIBLE_TARGET_GROUP=TARGET_LIST
 ANSIBLE_CHECK_LOG=/tmp/ansible_raw.log
 
-ansible -i /home/${ANSIBLE_ACCOUNT}/shell/INVENTORY/verify.hosts ${ANSIBLE_TARGET_GROUP} -t ./logs/ -u ${ANSIBLE_ACCOUNT} -b -m shell -a "id" | egrep 'CHANGED|Failed' > ${ANSIBLE_CHECK_LOG}
+ansible -i /home/${ANSIBLE_ACCOUNT}/ANSIBLE_SCRIPT/INVENTORY/verify.hosts ${ANSIBLE_TARGET_GROUP} -t ./logs/ -u ${ANSIBLE_ACCOUNT} -b -m shell -a "id" | egrep 'CHANGED|Failed' > ${ANSIBLE_CHECK_LOG}
 
 declare -a ARRAY_CHECK_OK
 declare -a ARRAY_CHECK_FAIL
