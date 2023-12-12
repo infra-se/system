@@ -6,8 +6,8 @@
   become: yes
   vars:
     ansible_account: "{{ vars_ansible_account }}"
-    src_path: /home/{{ ansible_account }}/shell/USER_DEFINE_SCRIPT
-    dst_path: /home/{{ ansible_account }}/shell/USER_DEFINE_SCRIPT
+    src_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/USER_DEFINE_SCRIPT
+    dst_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/USER_DEFINE_SCRIPT
     run_script: "{{ vars_run_script }}"
 
   tasks:
