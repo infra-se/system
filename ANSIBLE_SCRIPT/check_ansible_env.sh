@@ -5,10 +5,11 @@ SCRIPT_VER=0.2.20231212
 export LANG=C
 export LC_ALL=C
 
-ANSIBLE_ACCOUNT=labic2
+ANSIBLE_ACCOUNT=ansadm
+ANSIBLE_TARGET_GROUP=TARGET_LIST
 ANSIBLE_CHECK_LOG=/tmp/ansible_raw.log
 
-ansible -i /home/${ANSIBLE_ACCOUNT}/shell/INVENTORY/verify.hosts TARGET_LIST -t ./logs/ -u ${ANSIBLE_ACCOUNT} -b -m shell -a "id" | egrep 'CHANGED|Failed' > ${ANSIBLE_CHECK_LOG}
+ansible -i /home/${ANSIBLE_ACCOUNT}/shell/INVENTORY/verify.hosts ${ANSIBLE_TARGET_GROUP} -t ./logs/ -u ${ANSIBLE_ACCOUNT} -b -m shell -a "id" | egrep 'CHANGED|Failed' > ${ANSIBLE_CHECK_LOG}
 
 declare -a ARRAY_CHECK_OK
 declare -a ARRAY_CHECK_FAIL
