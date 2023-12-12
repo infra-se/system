@@ -1,0 +1,31 @@
+---
+- hosts: '{{ excute_group }}'
+  gather_facts: no
+  connection: ssh
+  remote_user: '{{ vars_ansible_account }}'
+  become: yes
+  vars:
+    ansible_account: "{{ vars_ansible_account }}"
+    src_path: /home/{{ ansible_account }}/shell/USER_DEFINE_SCRIPT
+    dst_path: /home/{{ ansible_account }}/shell/USER_DEFINE_SCRIPT
+    run_script: "{{ vars_run_script }}"
+
+  tasks:
+    - name: Check Script Dir - {{ dst_path }}
+      stat: path={{dst_path}}
+      register: check_dir
+
+    - name: Make Script Dir - {{ dst_path }}
+      shell: "mkdir -p {{dst_path}}"
+      when: not check_dir.stat.exists
+
+    - name: Deploy Main Script
+      copy: src={{src_path}}/{{ run_script }} dest={{dst_path}}/{{ run_script }} mode=755 owner=root force=yes
+
+    - name: Run Script
+      shell: "{{dst_path}}/{{ run_script }}"
+      register: result
+
+    - name: Check Result File
+      debug:
+        msg: "{{ result.stdout.split('\n') }}"

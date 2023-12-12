@@ -1,0 +1,30 @@
+---
+- hosts: '{{ excute_group }}'
+  gather_facts: no
+  connection: ssh
+  remote_user: '{{ vars_ansible_account }}'
+  become: yes  
+  vars:
+    ansible_account: "{{ vars_ansible_account }}"
+    src_path: /home/{{ ansible_account }}/shell/SUB_SCRIPT
+    dst_path: /home/{{ ansible_account }}/shell/SUB_SCRIPT
+  
+  tasks:
+    - name: "Check Script Dir - {{dst_path}} : Progress 5%"
+      stat: path={{dst_path}}
+      register: check_dir
+
+    - name: "Make Script Dir - {{dst_path}} : Progress 10%"
+      shell: "mkdir -p {{dst_path}}"
+      when: not check_dir.stat.exists
+
+    - name: "Deploy Resource Collect Script : Progress 15%"
+      copy: src={{src_path}}/sub_resource_collect.sh dest={{dst_path}}/sub_resource_collect.sh mode=755 owner={{ ansible_account }} force=yes
+
+    - name: "Run Resource Collect Script : Progress 20%"
+      shell: "{{dst_path}}/sub_resource_collect.sh"
+      register: result
+
+    - name : "Print Result : Progress 70%"
+      debug:
+        msg: "{{ result.stdout.split('\n') }}"
