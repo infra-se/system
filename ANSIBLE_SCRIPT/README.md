@@ -5,7 +5,19 @@
 2. wget -O - https://github.com/infra-se/system/blob/main/ANSIBLE_SCRIPT/get_script.sh?raw=true | bash
 3. cd ~/ANSIBLE_SCRIPT
 4. Configure ansible.cfg or Delete ansible.cfg
-5. Open the ci_collect.sh, resources_collect.sh, and user_define_script.sh Scripts and modify the ANSIBLE_ACCOUNT and ANSIBLE_TARGET_GROUP variables to suit your environment.
+```
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ 
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ pwd
+/home/helperchoi/ANSIBLE_SCRIPT
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ 
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ ls -l ansible.cfg 
+-rwxr-x--- 1 helperchoi helperchoi 417 Nov 25 10:57 ansible.cfg
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ 
+[helperchoi@centos01 ANSIBLE_SCRIPT]$ vi ansible.cfg
+
+[helperchoi@centos01 ANSIBLE_SCRIPT]$
+```
+6. Open the ci_collect.sh, resources_collect.sh, and user_define_script.sh Scripts and modify the ANSIBLE_ACCOUNT and ANSIBLE_TARGET_GROUP variables to suit your environment.
 
 ```
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ vi ci_collect.sh 
