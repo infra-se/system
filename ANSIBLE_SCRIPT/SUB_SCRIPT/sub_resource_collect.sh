@@ -1,4 +1,6 @@
 #!/bin/bash
+#Script made by  helperchoi@gmail.com
+SCRIPT_VERSION=0.2.20231212
 
 export LANG=C
 export LC_ALL=C
