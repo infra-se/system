@@ -57,3 +57,95 @@ Module dstat_nfs3 failed to load. (Cannot open file /proc/net/rpc/nfs)
 [root@centos01 management_os]# 
 ```
 
+3. change_oom_score.sh
+```
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./change_oom_score.sh 
+[INFO] centos01 Target does not exist. : altibase
+[INFO] centos01 Target does not exist. : oracle
+[INFO] centos01 Change OOM Score PID : mysqld / 8641
+[INFO] centos01 Change OOM Score PID : mysqld / 8806
+[INFO] centos01 mysqld / 8810 OOM Score OK.
+[INFO] centos01 mysqld / 8811 OOM Score OK.
+[INFO] centos01 mysqld / 8812 OOM Score OK.
+[INFO] centos01 mysqld / 8813 OOM Score OK.
+[INFO] centos01 mysqld / 8814 OOM Score OK.
+[INFO] centos01 mysqld / 8815 OOM Score OK.
+[INFO] centos01 mysqld / 8816 OOM Score OK.
+[INFO] centos01 mysqld / 8817 OOM Score OK.
+[INFO] centos01 mysqld / 8818 OOM Score OK.
+[INFO] centos01 mysqld / 8819 OOM Score OK.
+[INFO] centos01 mysqld / 8820 OOM Score OK.
+[INFO] centos01 mysqld / 8821 OOM Score OK.
+[INFO] centos01 mysqld / 8822 OOM Score OK.
+[INFO] centos01 mysqld / 8823 OOM Score OK.
+[INFO] centos01 mysqld / 8824 OOM Score OK.
+[INFO] centos01 mysqld / 8825 OOM Score OK.
+[INFO] centos01 mysqld / 8833 OOM Score OK.
+[INFO] centos01 mysqld / 8834 OOM Score OK.
+[INFO] centos01 Target does not exist. : postgres
+[root@centos01 management_os]# 
+```
+
+4. check_ethernet_info.sh
+```
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./check_ethernet_info.sh 
+[CHECK_RESULT] centos01 enp0s3 08:00:27:3e:f2:47 192.168.137.10/24 SINGLE UP 
+[CHECK_RESULT] centos01 enp0s8 08:00:27:05:fa:5e 192.168.100.100/24 SINGLE UP 
+[root@centos01 management_os]# 
+```
+
+5. check_web.sh
+```
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./check_web.sh 
+
+Usage1 - ./check_web.sh [List File]
+ex1) - ./check_web.sh list
+
+[root@centos01 management_os]# 
+[root@centos01 management_os]# 
+[root@centos01 management_os]# cat list
+google.com
+naver.com
+142.250.198.14
+192.168.137.10
+192.168.137.20
+[root@centos01 management_os]# 
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./check_web.sh list
+
+========================= HTTP OK =========================
+HTTP Code 301 OK - google.com
+HTTP Code 301 OK - naver.com
+HTTP Code 301 OK - 142.250.198.14
+======================== HTTP Fail ========================
+(Response Server Error Code)
+HTTP Code 403 Fail - 192.168.137.10
+===================== HTTP Not Listen =====================
+(Not Response or Connection Timeout)
+HTTP Not Listen - 192.168.137.20
+
+[root@centos01 management_os]#
+```
+
+6. user_define_fd_cnt.sh
+```
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./user_define_fd_cnt.sh 
+
+### 1. Please Input : System Account Name ###
+
+Usage ex) : ./user_define_fd_cnt.sh root
+
+[root@centos01 management_os]# 
+[root@centos01 management_os]# ./user_define_fd_cnt.sh apache
+PID(9072) FD Count : 41
+PID(9073) FD Count : 41
+PID(9074) FD Count : 41
+PID(9075) FD Count : 41
+PID(9076) FD Count : 41
+### USER (apache) Total FD : 205 ###
+[root@centos01 management_os]# 
+```
