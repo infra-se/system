@@ -1,5 +1,5 @@
-# This Directory is Ansible Script Top Path.
-[ Usage ]
+# Description : Ansible YAML and Script below are used to automatically collect and manage infrastructure OS CI information.
+## [ Usage ]
 
 1. Create Ansible Account or Login Ansible Account. (ex : su - helperchoi)
 2. wget -O - https://github.com/infra-se/system/blob/main/ANSIBLE_SCRIPT/get_script.sh?raw=true | bash
@@ -242,4 +242,4 @@ rhel01    VirtualBox  Red Hat  6.10  N/A            N/A    2.12  1.0.1e
 [helperchoi@centos01 ANSIBLE_SCRIPT]$ 
 ```
 
-# [ END ]
+## [ END ]
