@@ -1,5 +1,5 @@
 # [ Description ]
-: Ansible YAML and Script below are used to automatically collect and manage infrastructure OS CI information.
+This Ansible YAML and Script below are used to automatically collect and manage infrastructure OS CI information.
 
 
 ## Key Functions:
