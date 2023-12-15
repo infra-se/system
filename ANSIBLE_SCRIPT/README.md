@@ -3,17 +3,6 @@
 
 
 ## Key Functions:
-FUNCT_CHECK_OS: Retrieves information about the operating system, including family, version, and kernel version.
-
-FUNCT_CHECK_PLATFORM: Retrieves information about the platform, including vendor and product name.
-
-FUNCT_CHECK_PERM: Retrieves information about file permissions, owner, and group.
-
-FUNCT_CHECK_PACKAGE: Checks whether a specific package is installed.
-
-FUNCT_NATIVE_DATE: Converts a Unix timestamp to a human-readable date format.
-
-FUNCT_UNIX_DATE: Converts a human-readable date format to a Unix timestamp.
 
 FUNCT_CI_COLLECT_01: Collects basic system information, such as CPU model, CPU count, memory size, disk space, and local IP addresses.
 
