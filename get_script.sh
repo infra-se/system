@@ -22,6 +22,7 @@ then
 	mv system/management_os /root/shell/management_os
 	mv system/management_git /root/shell/management_git
 	rm -rf system
+ 	chmod -R 750 /root/shell/management_os /root/shell/management_git
 
 	echo
 	echo "[INFO] Script Download Path : ${WORK_PATH}"
