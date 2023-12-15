@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_VER=0.2.20231212
-ANSIBLE_ACCOUNT=ansadm
+ANSIBLE_ACCOUNT=helperchoi
 ANSIBLE_TARGET_GROUP=TARGET_LIST
 
 export LANG=C
