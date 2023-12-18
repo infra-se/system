@@ -19,6 +19,7 @@ else
  	echo
 
 	cd ~
+ 	rm -rf ./ANSIBLE_SCRIPT
         git clone https://github.com/infra-se/system.git
         mv system/ANSIBLE_SCRIPT ./
         rm -rf system
