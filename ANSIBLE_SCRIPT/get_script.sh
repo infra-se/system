@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Ansible Script Initialize"
-SCRIPT_VER=0.1.20231212
+SCRIPT_VER=0.2.20231218
 
 export LANG=C
 export LC_ALL=C
@@ -19,13 +19,10 @@ else
  	echo
 
 	cd ~
-	rm -rf .git ./ANSIBLE_SCRIPT
-	git init
-	git config core.sparseCheckout true
-	git remote add -f origin https://github.com/infra-se/system.git
-	echo "ANSIBLE_SCRIPT" > .git/info/sparse-checkout
-	git pull origin main
-	chmod -R 750 ./ANSIBLE_SCRIPT
+        git clone https://github.com/infra-se/system.git
+        mv system/ANSIBLE_SCRIPT ./
+        rm -rf system
+        chmod -R 750 ./ANSIBLE_SCRIPT
  	echo
   	echo "[INFO] Ansible Script Path : /home/${USER}/ANSIBLE_SCRIPT"
   	echo
