@@ -26,6 +26,7 @@ else
         mv system/ANSIBLE_SCRIPT ./
         rm -rf system
         chmod -R 750 ./ANSIBLE_SCRIPT
+	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/ansible.cfg
  	echo
   	echo "[INFO] Ansible Script Download Path : ${WORK_PATH}"
   	echo
