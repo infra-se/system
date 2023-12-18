@@ -27,4 +27,5 @@ else
   	echo "[INFO] Ansible Script Path : /home/${USER}/ANSIBLE_SCRIPT"
   	echo
 	ls -l ./ANSIBLE_SCRIPT
+ 	cd /home/${USER}/ANSIBLE_SCRIPT
 fi
