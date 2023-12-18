@@ -16,7 +16,7 @@ then
 else
 	echo
 	echo "[INFO] Download the Ansible script to the top path under the user account."
-	echo "(/home/ANSIBLE_ACCOUNT/ANSIBLE_SCRIPT)"
+	echo "(${WORK_PATH})"
  	echo
 
 	echo "[INFO] Script Path Initialize : ${WORK_PATH}"
