@@ -2,6 +2,7 @@
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Ansible Script Initialize"
 SCRIPT_VER=0.2.20231218
+WORK_PATH=/home/${USER}/ANSIBLE_SCRIPT
 
 export LANG=C
 export LC_ALL=C
@@ -15,9 +16,10 @@ then
 else
 	echo
 	echo "[INFO] Download the Ansible script to the top path under the user account."
-	echo "(ex : /home/ANSIBLE_ACCOUNT/ANSIBLE_SCRIPT)"
+	echo "(/home/ANSIBLE_ACCOUNT/ANSIBLE_SCRIPT)"
  	echo
 
+	echo "[INFO] Script Path Initialize : ${WORK_PATH}"
 	cd ~
  	rm -rf ./ANSIBLE_SCRIPT
         git clone https://github.com/infra-se/system.git
