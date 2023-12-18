@@ -30,6 +30,4 @@ else
   	echo "[INFO] Ansible Script Download Path : ${WORK_PATH}"
   	echo
 	find ${WORK_PATH} -type f
-   
- 	cd /home/${USER}/ANSIBLE_SCRIPT
 fi
