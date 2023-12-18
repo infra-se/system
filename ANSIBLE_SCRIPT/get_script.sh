@@ -27,8 +27,9 @@ else
         rm -rf system
         chmod -R 750 ./ANSIBLE_SCRIPT
  	echo
-  	echo "[INFO] Ansible Script Path : /home/${USER}/ANSIBLE_SCRIPT"
+  	echo "[INFO] Ansible Script Download Path : ${WORK_PATH}"
   	echo
-	ls -l ./ANSIBLE_SCRIPT
+	find ${WORK_PATH} -type f
+   
  	cd /home/${USER}/ANSIBLE_SCRIPT
 fi
