@@ -1,24 +1,6 @@
 # [ Description ]
 This Ansible YAML and Script below are used to automatically collect and manage infrastructure OS CI information.
 
-
-## Key Functions:
-
-FUNCT_CI_COLLECT_01: Collects basic system information, such as CPU model, CPU count, memory size, disk space, and local IP addresses.
-
-FUNCT_CI_COLLECT_02: Collects detailed information about mounted drives, including mount point, device name, file system type, size, type, used size, and daily cumulative usage.
-
-FUNCT_CI_COLLECT_03: Collects information about user accounts, including username, UID, GID, home directory, and shell path.
-
-FUNCT_CI_COLLECT_04: Collects information about running processes, including process ID, owner, and command.
-
-FUNCT_CI_COLLECT_05: Collects information about network interfaces, including interface name, MAC address, IP address, type (master/slave/single), and link status.
-
-FUNCT_CI_COLLECT_06: Collects information about active network sessions, including protocol, source port, destination port, session state, and process information.
-
-FUNCT_CI_COLLECT_07: Checks for the presence of various software packages, including GCC, Java, glibc, and OpenSSL. It also retrieves their versions.
-
-
 ## [ Usage ]
 
 1. Create Ansible Account or Login Ansible Account. (ex : su - helperchoi)
@@ -263,3 +245,20 @@ rhel01    VirtualBox  Red Hat  6.10  N/A            N/A    2.12  1.0.1e
 ```
 
 ## [ END ]
+
+
+## [ Key Functions Description ]
+
+FUNCT_CI_COLLECT_01: Collects basic system information, such as CPU model, CPU count, memory size, disk space, and local IP addresses.
+
+FUNCT_CI_COLLECT_02: Collects detailed information about mounted drives, including mount point, device name, file system type, size, type, used size, and daily cumulative usage.
+
+FUNCT_CI_COLLECT_03: Collects information about user accounts, including username, UID, GID, home directory, and shell path.
+
+FUNCT_CI_COLLECT_04: Collects information about running processes, including process ID, owner, and command.
+
+FUNCT_CI_COLLECT_05: Collects information about network interfaces, including interface name, MAC address, IP address, type (master/slave/single), and link status.
+
+FUNCT_CI_COLLECT_06: Collects information about active network sessions, including protocol, source port, destination port, session state, and process information.
+
+FUNCT_CI_COLLECT_07: Checks for the presence of various software packages, including GCC, Java, glibc, and OpenSSL. It also retrieves their versions.
