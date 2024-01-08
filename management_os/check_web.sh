@@ -31,37 +31,48 @@ then
 			ARRAY_NOT=("${ARRAY_NOT[@]}" "`echo "HTTP Not Listen - ${LIST}"`")
 		fi
 	done
+		if [ ${#ARRAY_OK[@]} -ne 0 ]
+		then
+			echo
+			echo "========================= HTTP OK ========================="
+			LOOP_COUNT=0
+			LOOP_LIMIT=${#ARRAY_OK[@]}
+			while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
+			do
+				echo "${ARRAY_OK[${LOOP_COUNT}]}"
+				LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
+			done
+		fi
 
-		echo
-		echo "========================= HTTP OK ========================="
-		LOOP_COUNT=0
-		LOOP_LIMIT=${#ARRAY_OK[@]}
-		while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
-		do
-			echo "${ARRAY_OK[${LOOP_COUNT}]}"
-			LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
-		done
-
-		echo "======================== HTTP Fail ========================"
-		echo "(Response Server Error Code)"
-		LOOP_COUNT=0
-		LOOP_LIMIT=${#ARRAY_FAIL[@]}
-		while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
-		do
-			echo "${ARRAY_FAIL[${LOOP_COUNT}]}"
-			LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
-		done
+		if [ ${#ARRAY_FAIL[@]} -ne 0 ]
+		then
+			echo "======================== HTTP Fail ========================"
+			echo "(Response Server Error Code)"
+			LOOP_COUNT=0
+			LOOP_LIMIT=${#ARRAY_FAIL[@]}
+			while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
+			do
+				echo "${ARRAY_FAIL[${LOOP_COUNT}]}"
+				LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
+			done
+		fi
 	
-		echo "===================== HTTP Not Listen ====================="
-		echo "(Not Response or Connection Timeout)"
-		LOOP_COUNT=0
-		LOOP_LIMIT=${#ARRAY_NOT[@]}
-		while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
-		do
-			echo "${ARRAY_NOT[${LOOP_COUNT}]}"
-			LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
-		done
+		if [ ${#ARRAY_NOT[@]} -ne 0 ]
+		then
+			echo "===================== HTTP Not Listen ====================="
+			echo "(Not Response or Connection Timeout)"
+			LOOP_COUNT=0
+			LOOP_LIMIT=${#ARRAY_NOT[@]}
+			while [ "${LOOP_COUNT}" -lt "${LOOP_LIMIT}" ]
+			do
+				echo "${ARRAY_NOT[${LOOP_COUNT}]}"
+				LOOP_COUNT=`echo "${LOOP_COUNT} + 1" | bc`
+			done
+		fi
+
+		echo "==========================================================="
 		echo
+  
 else 
 	echo
 	echo "Usage1 - $0 [List File]"
