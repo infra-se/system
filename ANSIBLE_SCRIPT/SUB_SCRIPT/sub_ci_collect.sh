@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by  helperchoi@gmail.com
 SCRIPT_DESCRIPTION="CI Collect Script"
-SCRIPT_VERSION=0.3.20231031
+SCRIPT_VERSION=0.4.20240125
 
 export LANG=C
 export LC_ALL=C
@@ -334,6 +334,32 @@ FUNCT_CATEGORY=CI_SHEET_07
 	fi
 }
 
+FUNCT_CI_COLLECT_08() {
+FUNCT_CATEGORY=CI_SHEET_08
+
+	DIREC_LIST=`find / -maxdepth 1 -type d | egrep -iv "^/$|^/boot$|^/proc$|^/dev$|^/run$|^/sys$|^/etc$|^/bin$|^/sbin$|^/lib$|^/lib64$|^/root$|^/var$|^/tmp$|^/usr$|^/media$|^/mnt$|^/srv$|^/opt$|^/lost\+found$"`
+
+	for LIST in ${DIREC_LIST}
+	do
+		FILE_COUNT=`ls -AlR ${LIST} | egrep -v ':$|^total|^$|^d' | wc -l`
+	        USED_SIZE=`du -sh ${LIST} | awk '{print $1}'`
+	        MOUNT_CHECK=`df -hTP | grep "${LIST}$" | wc -l`
+
+		if [ ${MOUNT_CHECK} -eq 0 ]
+	        then
+	                export M_POINT_SIZE=`df -hTP / | grep -vi "filesystem" | awk '{print $3}'`
+	                export M_USED_SIZE=`df -hTP / | grep -vi "filesystem" | awk '{print $4}'`
+	                export M_POINT="/"
+	        else
+	                export M_POINT_SIZE=`df -hTP ${LIST} | grep -vi "filesystem" | awk '{print $3}'`
+	                export M_USED_SIZE=`df -hTP ${LIST} | grep -vi "filesystem" | awk '{print $4}'`
+	                export M_POINT="${LIST}"
+	        fi
+
+	        echo "[CHECK_RESULT] ${FUNCT_CATEGORY}|${HOSTNAME}|${M_POINT}|${M_POINT_SIZE}|${M_USED_SIZE}|${LIST}|${USED_SIZE}|${FILE_COUNT}"
+	done
+}
+
 
 ######################
 #### RUN FUNCTION ####
@@ -346,3 +372,4 @@ FUNCT_CI_COLLECT_04
 FUNCT_CI_COLLECT_05
 FUNCT_CI_COLLECT_06
 FUNCT_CI_COLLECT_07
+FUNCT_CI_COLLECT_08
