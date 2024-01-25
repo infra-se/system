@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Get Manual CI Collect Script"
-SCRIPT_VER=0.2.20240125
+SCRIPT_VER=0.3.20240125
 
 export LANG=C
 export LC_ALL=C
@@ -21,11 +21,11 @@ then
 	mv system/MANUAL_CI_COLLECT ${WORK_PATH}/MANUAL_CI_COLLECT
 	rm -rf system
  	chmod -R 750 ${WORK_PATH}/MANUAL_CI_COLLECT
-  	rm -f ${WORK_PATH}/MANUAL_CI_COLLECT/get_script.sh
 	mkdir -p ${WORK_PATH}/MANUAL_CI_COLLECT/logs
 
 	echo
 	echo "[INFO] Script Download Path : ${WORK_PATH}/MANUAL_CI_COLLECT "
+ 	rm -f ${WORK_PATH}/MANUAL_CI_COLLECT/get_script.sh
 	find ${WORK_PATH} -type f
 	echo
 else
