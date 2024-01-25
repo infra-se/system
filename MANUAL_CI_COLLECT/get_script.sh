@@ -21,6 +21,7 @@ then
 	mv system/MANUAL_CI_COLLECT ${WORK_PATH}/MANUAL_CI_COLLECT
 	rm -rf system
  	chmod -R 750 ${WORK_PATH}/MANUAL_CI_COLLECT
+	mkdir -p ${WORK_PATH}/MANUAL_CI_COLLECT/logs
 
 	echo
 	echo "[INFO] Script Download Path : ${WORK_PATH}"
