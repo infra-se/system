@@ -5,6 +5,36 @@ The Script below is used to manually collect Infrastructure CI information.
 
 1. Login 'root' Account. (or sudo -i)
 2. wget -O - https://github.com/infra-se/system/blob/main/MANUAL_CI_COLLECT/get_script.sh?raw=true | bash
+```
+[root@centos02 ~]# 
+[root@centos02 ~]# id
+uid=0(root) gid=0(root) groups=0(root) context=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023
+[root@centos02 ~]# 
+[root@centos02 ~]# pwd
+/root
+[root@centos02 ~]# 
+[root@centos02 ~]# wget -O - https://github.com/infra-se/system/blob/main/MANUAL_CI_COLLECT/get_script.sh?raw=true | bash
+
+
+...
+
+HTTP request sent, awaiting response... 200 OK
+Length: 840 [text/plain]
+Saving to: ‘STDOUT’
+
+100%[=======================================================================================================================================================================>] 840         --.-K/s   in 0s      
+
+2024-01-11 05:32:28 (95.1 MB/s) - written to stdout [840/840]
+
+...
+
+[INFO] Script Download Path : /root/shell/MANUAL_CI_COLLECT 
+/root/shell/MANUAL_CI_COLLECT/README.md
+/root/shell/MANUAL_CI_COLLECT/get_script.sh
+/root/shell/MANUAL_CI_COLLECT/manual_ci_collect.sh
+
+```
+
 3. cd /root/shell/MANUAL_CI_COLLECT
 4. Run Script : manual_ci_collect.sh
 ```
