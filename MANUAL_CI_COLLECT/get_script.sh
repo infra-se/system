@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Get Manual CI Collect Script"
-SCRIPT_VER=0.1.20240125
+SCRIPT_VER=0.2.20240125
 
 export LANG=C
 export LC_ALL=C
@@ -13,7 +13,7 @@ then
 	cd ${WORK_PATH}
 
 	echo
-	echo "[INFO] Script Path Initialize : ${WORK_PATH}/MANUAL_CI_COLLECT"
+	echo "[INFO] Script Path Initialize : ${WORK_PATH}/MANUAL_CI_COLLECT "
 	rm -rf ${WORK_PATH}/MANUAL_CI_COLLECT
 
 	git clone https://github.com/infra-se/system.git
@@ -24,7 +24,7 @@ then
 	mkdir -p ${WORK_PATH}/MANUAL_CI_COLLECT/logs
 
 	echo
-	echo "[INFO] Script Download Path : ${WORK_PATH}/MANUAL_CI_COLLECT"
+	echo "[INFO] Script Download Path : ${WORK_PATH}/MANUAL_CI_COLLECT "
 	find ${WORK_PATH} -type f
 	echo
 else
