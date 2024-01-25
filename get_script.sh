@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Get System Managed Script"
-SCRIPT_VER=0.1.20231215
+SCRIPT_VER=0.2.20240125
 
 export LANG=C
 export LC_ALL=C
@@ -26,6 +26,7 @@ then
 
 	echo
 	echo "[INFO] Script Download Path : ${WORK_PATH}"
+ 	rm -f ${WORK_PATH}/get_script.sh
 	find ${WORK_PATH} -type f
 	echo
 else
