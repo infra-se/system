@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Ansible Script Initialize"
-SCRIPT_VER=0.4.20240125
+SCRIPT_VER=0.5.20240125
 WORK_PATH=/home/${USER}/ANSIBLE_SCRIPT
 
 export LANG=C
@@ -33,6 +33,7 @@ else
 	sed -i "s#ANSIBLE_ACCOUNT=helperchoi#ANSIBLE_ACCOUNT=${USER}#g" ${WORK_PATH}/user_define_script.sh
  	echo
   	echo "[INFO] Ansible Script Download Path : ${WORK_PATH}"
+   	rm -f rm -f ${WORK_PATH}/get_script.sh
   	echo
 	find ${WORK_PATH} -type f
 fi
