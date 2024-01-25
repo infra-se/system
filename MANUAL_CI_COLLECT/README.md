@@ -3,7 +3,7 @@ The Script below is used to manually collect Infrastructure CI information.
 
 ## [ Usage ]
 
-1. Create Ansible Account or Login Ansible Account. (ex : su - helperchoi)
+1. Login 'root' Account. (or sudo -i)
 2. wget -O - https://github.com/infra-se/system/blob/main/MANUAL_CI_COLLECT/get_script.sh?raw=true | bash
 3. cd /root/shell/MANUAL_CI_COLLECT
 4. Run Script : manual_ci_collect.sh
