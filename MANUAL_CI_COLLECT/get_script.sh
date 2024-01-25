@@ -21,6 +21,7 @@ then
 	mv system/MANUAL_CI_COLLECT ${WORK_PATH}/MANUAL_CI_COLLECT
 	rm -rf system
  	chmod -R 750 ${WORK_PATH}/MANUAL_CI_COLLECT
+  	rm -f ${WORK_PATH}/MANUAL_CI_COLLECT/get_script.sh
 	mkdir -p ${WORK_PATH}/MANUAL_CI_COLLECT/logs
 
 	echo
