@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Ansible Script Initialize"
-SCRIPT_VER=0.2.20231218
+SCRIPT_VER=0.3.20240125
 WORK_PATH=/home/${USER}/ANSIBLE_SCRIPT
 
 export LANG=C
@@ -27,6 +27,10 @@ else
         rm -rf system
         chmod -R 750 ./ANSIBLE_SCRIPT
 	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/ansible.cfg
+	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/check_ansible_env.sh
+	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/ci_collect.sh
+	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/resource_collect.sh
+	sed -i "s#/home/ANSIBLE_ACCOUNT#/home/${USER}#g" ${WORK_PATH}/user_define_script.sh
  	echo
   	echo "[INFO] Ansible Script Download Path : ${WORK_PATH}"
   	echo
