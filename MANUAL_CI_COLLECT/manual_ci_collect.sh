@@ -3,7 +3,7 @@
 SCRIPT_DESCRIPTION="Manual CI Collect Script"
 SCRIPT_VERSION=0.1.20240125
 
-WORK_PATH=/root/shell
+WORK_PATH=/root/shell/MANUAL_CI_COLLECT
 LOG_DIR=${WORK_PATH}/logs
 CI_LOG_01=${LOG_DIR}/ci_01.log
 CI_LOG_02=${LOG_DIR}/ci_02.log
