@@ -13,7 +13,7 @@ then
 	cd ${WORK_PATH}
 
 	echo
-	echo "[INFO] Script Path Initialize : ${WORK_PATH}"
+	echo "[INFO] Script Path Initialize : ${WORK_PATH}/MANUAL_CI_COLLECT"
 	rm -rf ${WORK_PATH}/MANUAL_CI_COLLECT
 
 	git clone https://github.com/infra-se/system.git
