@@ -24,7 +24,7 @@ then
 	mkdir -p ${WORK_PATH}/MANUAL_CI_COLLECT/logs
 
 	echo
-	echo "[INFO] Script Download Path : ${WORK_PATH}"
+	echo "[INFO] Script Download Path : ${WORK_PATH}/MANUAL_CI_COLLECT"
 	find ${WORK_PATH} -type f
 	echo
 else
