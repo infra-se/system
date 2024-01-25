@@ -1,17 +1,18 @@
 #!/bin/bash
 #Script made by  helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Manual CI Collect Script"
-SCRIPT_VERSION=0.1.20240125
+SCRIPT_VERSION=0.2.20240125
 
 WORK_PATH=/root/shell/MANUAL_CI_COLLECT
 LOG_DIR=${WORK_PATH}/logs
-CI_LOG_01=${LOG_DIR}/ci_01.log
-CI_LOG_02=${LOG_DIR}/ci_02.log
-CI_LOG_03=${LOG_DIR}/ci_03.log
-CI_LOG_04=${LOG_DIR}/ci_04.log
-CI_LOG_05=${LOG_DIR}/ci_05.log
-CI_LOG_06=${LOG_DIR}/ci_06.log
-CI_LOG_07=${LOG_DIR}/ci_07.log
+CI_LOG_01=${LOG_DIR}/${HOSTNAME}_ci_01.log
+CI_LOG_02=${LOG_DIR}/${HOSTNAME}_ci_02.log
+CI_LOG_03=${LOG_DIR}/${HOSTNAME}_ci_03.log
+CI_LOG_04=${LOG_DIR}/${HOSTNAME}_ci_04.log
+CI_LOG_05=${LOG_DIR}/${HOSTNAME}_ci_05.log
+CI_LOG_06=${LOG_DIR}/${HOSTNAME}_ci_06.log
+CI_LOG_07=${LOG_DIR}/${HOSTNAME}_ci_07.log
+CI_LOG_08=${LOG_DIR}/${HOSTNAME}_ci_08.log
 
 export LANG=C
 export LC_ALL=C
@@ -352,6 +353,31 @@ else
 			done
 		fi
 	}
+
+
+	FUNCT_CI_COLLECT_08() {
+	DIREC_LIST=`find / -maxdepth 1 -type d | egrep -iv "^/$|^/boot$|^/proc$|^/dev$|^/run$|^/sys$|^/etc$|^/bin$|^/sbin$|^/lib$|^/lib64$|^/root$|^/var$|^/tmp$|^/usr$|^/media$|^/mnt$|^/srv$|^/opt$|^/lost\+found$"`
+
+		for LIST in ${DIREC_LIST}
+		do
+			FILE_COUNT=`ls -AlR ${LIST} | egrep -v ':$|^total|^$|^d' | wc -l`
+		        USED_SIZE=`du -sh ${LIST} | awk '{print $1}'`
+		        MOUNT_CHECK=`df -hTP | grep "${LIST}$" | wc -l`
+
+			if [ ${MOUNT_CHECK} -eq 0 ]
+		        then
+		                export M_POINT_SIZE=`df -hTP / | grep -vi "filesystem" | awk '{print $3}'`
+		                export M_USED_SIZE=`df -hTP / | grep -vi "filesystem" | awk '{print $4}'`
+		                export M_POINT="/"
+		        else
+		                export M_POINT_SIZE=`df -hTP ${LIST} | grep -vi "filesystem" | awk '{print $3}'`
+		                export M_USED_SIZE=`df -hTP ${LIST} | grep -vi "filesystem" | awk '{print $4}'`
+		                export M_POINT="${LIST}"
+		        fi
+
+		        echo "${HOSTNAME}|${M_POINT}|${M_POINT_SIZE}|${M_USED_SIZE}|${LIST}|${USED_SIZE}|${FILE_COUNT}"
+		done
+	}
 	
 	
 	######################
@@ -365,5 +391,10 @@ else
 	FUNCT_CI_COLLECT_05 | sed 's#^ *##g' | sed 's#CI_SHEET_05|##g' | tee ${CI_LOG_05}
 	FUNCT_CI_COLLECT_06 | sed 's#^ *##g' | sed 's#CI_SHEET_06|##g' | tee ${CI_LOG_06}
 	FUNCT_CI_COLLECT_07 | sed 's#^ *##g' | sed 's#CI_SHEET_07|##g' | tee ${CI_LOG_07}
+	FUNCT_CI_COLLECT_08 | sed 's#^ *##g' | sed 's#CI_SHEET_08|##g' | tee ${CI_LOG_08}
 
+	echo
+	echo "[INFO] Please Download CI Logs : /root/shell/MANUAL_CI_COLLECT/logs/*"
+	ls -l /root/shell/MANUAL_CI_COLLECT/logs 
+	echo
 fi
