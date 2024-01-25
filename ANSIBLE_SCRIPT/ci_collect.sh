@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
-SCRIPT_VER=0.3.20231212
-ANSIBLE_ACCOUNT=helperchoi
+SCRIPT_VER=0.4.20240125
+ANSIBLE_ACCOUNT=ansadm
 ANSIBLE_TARGET_GROUP=TARGET_LIST
 
 export LANG=C
@@ -37,6 +37,7 @@ CI_LOG_04=${FINAL_RESULT_PATH}/ci_04.log
 CI_LOG_05=${FINAL_RESULT_PATH}/ci_05.log
 CI_LOG_06=${FINAL_RESULT_PATH}/ci_06.log
 CI_LOG_07=${FINAL_RESULT_PATH}/ci_07.log
+CI_LOG_08=${FINAL_RESULT_PATH}/ci_08.log
 
 mkdir -p ${FINAL_RESULT_PATH}
 
@@ -105,6 +106,10 @@ FUNCT_CREATE_SHEET_FILE_07() {
 	grep "CI_SHEET_07" ${TMP_RESULT_LOG} | sed 's#^ *##g' | sed 's#CI_SHEET_07|##g' 
 }
 
+FUNCT_CREATE_SHEET_FILE_08() {
+	grep "CI_SHEET_08" ${TMP_RESULT_LOG} | sed 's#^ *##g' | sed 's#CI_SHEET_08|##g' 
+}
+
 
 FUNCT_PRINT_RESULT() {
 	echo
@@ -147,6 +152,12 @@ FUNCT_PRINT_RESULT() {
 	echo "### CREATE CI SHEET 07 - ${CI_LOG_07} ###"
 	echo "[HOSTNAME] [PLATFORM] [OS_FAMILY] [OS_VER] [ENABLE_JDK] [GCC_VER] [GLIBC_VER] [OPENSSL_VER]" | column -t
 	FUNCT_CREATE_SHEET_FILE_07 | tee ${CI_LOG_07} | column -t -s "|"
+	echo
+
+	echo
+	echo "### CREATE CI SHEET 08 - ${CI_LOG_08} ###"
+	echo "[HOSTNAME] [M_POINT] [M_POINT_SIZE] [M_USED_SIZE] [DIR_NAME] [DIR_USED_SIZE] [FILE_COUNT]" | column -t
+	FUNCT_CREATE_SHEET_FILE_08 | tee ${CI_LOG_08} | column -t -s "|"
 	echo
 
 }
