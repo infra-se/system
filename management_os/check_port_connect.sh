@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 #Script Description : Check Destination Port 
-SCRIPT_VER=0.1.20240409
+SCRIPT_VER=0.3.20240409
 
 export LANG=C
 export LC_ALL=C
