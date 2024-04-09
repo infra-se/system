@@ -29,10 +29,8 @@ FUNCT_CHECK_OS() {
 	then
 		if [ `grep -i "ubuntu" /etc/*-release| wc -l` -gt 0 ]
 		then
-			echo "[ CHECK OS ] Debian Family"
 			export OS_PLATFORM="UBUNTU"
 		else
-			echo "[ CHECK OS ] Redhat Family"
 			export OS_PLATFORM="ROCKY"
 		fi
 	else
@@ -53,8 +51,6 @@ FUNCT_CHECK_NC() {
 			echo "[ CHECK NC ] Need for Install"
 			yum -y install nc
 		fi
-	else
-		echo "[ CHECK NC ] OK"
 	fi
 }
 
@@ -74,6 +70,14 @@ FUNCT_CHECK_LIST() {
 	done < ${LIST_FILE}
 }
 
+FUNCT_CHECK_HOST() {
+	echo
+	BASE_IP=`hostname -i`
+	echo "[CEHCK HOST] : ${HOSTNAME} / ${BASE_IP}"
+	echo
+}
+
 FUNCT_CHECK_OS
 FUNCT_CHECK_NC
+FUNCT_CHECK_HOST
 FUNCT_CHECK_LIST ${LIST_FILE}
