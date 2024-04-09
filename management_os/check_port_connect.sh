@@ -1,6 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 #Script Description : Check Destination Port 
+SCRIPT_VER=0.1.20240409
 
 export LANG=C
 export LC_ALL=C
@@ -58,7 +59,14 @@ FUNCT_CHECK_LOGIC() {
 	DST_IP=$1
 	DST_PORT=$2
 
-	nc -w 1 -zv ${DST_IP} ${DST_PORT}
+	nc -w 1 -zv ${DST_IP} ${DST_PORT} 2>&- > /dev/null
+
+	if [ $? -eq 0 ]
+	then
+		echo "[ OK ] ${DST_IP} ${DST_PORT}" 
+	else
+		echo "[ FAIL ] ${DST_IP} ${DST_PORT}" 
+	fi
 }
 
 FUNCT_CHECK_LIST() {
@@ -68,11 +76,12 @@ FUNCT_CHECK_LIST() {
 		FUNCT_CHECK_LOGIC ${LIST}
 		sleep 1
 	done < ${LIST_FILE}
+	echo
 }
 
 FUNCT_CHECK_HOST() {
 	echo
-	BASE_IP=`hostname -i`
+	BASE_IP=`hostname -I | awk '{print $1}'`
 	echo "[CEHCK HOST] : ${HOSTNAME} / ${BASE_IP}"
 	echo
 }
