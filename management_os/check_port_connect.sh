@@ -18,6 +18,8 @@ FUNCT_LIST_SYNTAX() {
 	echo "192.168.137.10 22"
 	echo "192.168.137.10 25"
 	echo "192.168.137.10 111"
+ 	echo "google.com 443"
+	echo "naver.com 443"
 	echo "[root@centos01 management_os]#" 
 	echo
 }
