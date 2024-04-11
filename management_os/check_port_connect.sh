@@ -1,17 +1,18 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 #Script Description : Check Destination Port 
-SCRIPT_VER=0.3.20240409
+SCRIPT_VER=0.4.20240411
 
 export LANG=C
 export LC_ALL=C
 
+#######################
+### VERIFY FUNCTION ###
+#######################
+
 LIST_FILE=$1
 
-if [ "$#" -ne 1 -o ! -e "${LIST_FILE}" ]
-then
-	echo
-	echo "Usage example) : $0 ./list"
+FUNCT_LIST_SYNTAX() {
 	echo
 	echo "[root@centos01 management_os]# vi list"
 	echo "192.168.137.10 22"
@@ -19,8 +20,62 @@ then
 	echo "192.168.137.10 111"
 	echo "[root@centos01 management_os]#" 
 	echo
-	exit 0
+}
+
+FUNCT_CHECK_FIELD() {
+	CHECK_FIELD=$1
+	FIELD_VALUE=`echo "${CHECK_FIELD}" | tr ' ' '\n' | wc -l`
+
+	if [ ${FIELD_VALUE} -ne 2 ]
+	then
+		export CHECK_RESULT=1
+		export ERROR_LINE="${CHECK_FIELD}"
+	else
+		export CHECK_RESULT=0
+	fi
+}
+
+FUNCT_CHECK_SYNTAX() {
+
+	LIST_FILE=$1
+	CHECK_SYNTAX_RESULT=0
+	LINE_NUM=1
+
+	
+	while read LIST
+	do
+		FUNCT_CHECK_FIELD "${LIST}"
+		if [ ${CHECK_RESULT} -eq 1 ]		
+		then
+			echo "[ERROR] Syntax Error : Line Nunber ${LINE_NUM}, >>> ${ERROR_LINE} <<<"
+			export CHECK_SYNTAX_RESULT=1
+		fi
+
+		LINE_NUM=`echo "${LINE_NUM} + 1" | bc`		
+	done < ${LIST_FILE}
+
+	if [ ${CHECK_SYNTAX_RESULT} -eq 1 ]
+	then
+		FUNCT_LIST_SYNTAX
+		exit 1
+	fi
+}
+
+
+if [ "$#" -ne 1 -o ! -e "${LIST_FILE}" ]
+then
+	echo
+	echo "Usage example) : $0 ./list"
+	FUNCT_LIST_SYNTAX
+	exit 1
+else
+	echo
+	FUNCT_CHECK_SYNTAX ${LIST_FILE}
 fi
+
+#####################
+### MAIN FUNCTION ###
+#####################
 
 FUNCT_CHECK_OS() {
 
@@ -80,7 +135,6 @@ FUNCT_CHECK_LIST() {
 }
 
 FUNCT_CHECK_HOST() {
-	echo
 	BASE_IP=`hostname -I | awk '{print $1}'`
 	echo "[CEHCK HOST] : ${HOSTNAME} / ${BASE_IP}"
 	echo
