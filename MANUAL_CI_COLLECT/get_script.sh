@@ -30,7 +30,7 @@ then
 	echo
 else
 	echo
-	echo "[ERROR] This script must be used in a root account environment for Script. (Can not excute 'User Account')"
+	echo "[ERROR] This script should only be used in the root account environment. (Can not excute 'User Account')"
 	echo
 	exit 1
 fi
