@@ -31,8 +31,15 @@ else
 	#########################
 	
 	FUNCT_CHECK_OS() {
-		export OS_FAMILY=`awk '{print $1, $2}' /etc/system-release | sed 's#Linux##' | sed 's#release##' | sed 's# $##'`
-		export OS_VER=`grep -o "release [0-9]\{1\}.[0-9]*" /etc/system-release | awk '{print $2}'`
+		if [ `grep -i "ubuntu" /etc/*-release| wc -l` -gt 0 ]
+		then
+			export OS_FAMILY="UBUNTU"
+		else
+			export OS_FAMILY="ROCKY"
+		fi
+
+		export OS_NAME=`grep "^NAME" /etc/os-release | cut -d "=" -f2 | sed 's#"##g'`
+		export OS_VER=`grep "^VERSION_ID" /etc/os-release | cut -d "=" -f2 | sed 's#"##g'`
 		export KER_VER=`uname -r`
 	}
 	
@@ -40,7 +47,10 @@ else
 		export CHECK_VENDOR=`dmidecode -t system | grep -i "Manufacturer" | cut -d : -f 2 | sed 's#^ *##g'`
 		export CHECK_PLATFORM=`dmidecode -t system | grep -i "Product Name" | cut -d : -f 2 | sed 's#^ *##g'`
 	}
-	
+
+	FUNCT_CHECK_OS
+	FUNCT_CHECK_PLATFORM
+ 
 	FUNCT_CHECK_PERM() {
 		TARGET_LIST=$1
 		CHECK_PERM=`stat -c '%a' ${TARGET_LIST}`
@@ -54,7 +64,13 @@ else
 	
 	FUNCT_CHECK_PACKAGE() {
 		TARGET_LIST=$1
-		CHECK_PACKAGE=`rpm -qi ${TARGET_LIST} | grep -i "not install" | wc -l`
+		if [ ${OS_FAMILY} == "ROCKY" ]
+		then
+			CHECK_PACKAGE=`rpm -qi ${TARGET_LIST} | grep -i "not install" | wc -l`
+		else
+			CHECK_PACKAGE=`dpkg -s ${TARGET_LIST} 2>&1 | grep -i "not install" | wc -l`
+		fi
+	
 		if [ ${CHECK_PACKAGE} -eq 1 ]
 		then
 			export CHECK_RESULT=1	
@@ -70,8 +86,14 @@ else
 	FUNCT_UNIX_DATE() {
 		date -d "$1" +%s
 	}
-	
-	INSTALL_DATE_UNIXTIME=`rpm -qa --qf '%{installtime}\n' coreutils`
+
+	if [ ${OS_FAMILY} == "ROCKY" ]
+	then
+		INSTALL_DATE_UNIXTIME=`rpm -qa --qf '%{installtime}\n' coreutils`
+	else
+		INSTALL_DATE_UNIXTIME=`date -d "$(uptime -s)" +%s`
+	fi
+
 	INSTALL_DATE_NATIVE=`FUNCT_NATIVE_DATE ${INSTALL_DATE_UNIXTIME}`
 	CAL_INSTALL_DATE=`FUNCT_UNIX_DATE ${INSTALL_DATE_NATIVE}`
 	TODAY_UNIXTIME=`date -d "now" +%s`
@@ -79,8 +101,7 @@ else
 	CAL_TODAY=`FUNCT_UNIX_DATE ${TODAY_NATIVE}`
 	CUMULATION_DATE=`echo "${CAL_INSTALL_DATE} ${CAL_TODAY}" | awk '{print ($2 - $1) / 86400}'`
 	
-	FUNCT_CHECK_OS
-	FUNCT_CHECK_PLATFORM
+
 	
 	
 	##################################
@@ -105,7 +126,7 @@ else
 		#DISK_SUM=`echo "${DISK_SUM_MB} / 1024" | bc`
 		DISK_SUM=`echo "${DISK_SUM_MB} 1024" | awk '{print $1 / $2}'`
 	
-		echo "${FUNCT_CATEGORY}|${HOSTNAME}|${INSTALL_DATE_NATIVE}|${CHECK_VENDOR}|${CHECK_PLATFORM}|${OS_FAMILY}|${OS_VER}|${KER_VER}|${CPU_MODEL}|${CPU_COUNT}|${MEM_SIZE}|${DISK_SUM}"
+		echo "${FUNCT_CATEGORY}|${HOSTNAME}|${INSTALL_DATE_NATIVE}|${CHECK_VENDOR}|${CHECK_PLATFORM}|${OS_NAME}|${OS_VER}|${KER_VER}|${CPU_MODEL}|${CPU_COUNT}|${MEM_SIZE}|${DISK_SUM}"
 	}
 	
 	
@@ -328,7 +349,7 @@ else
 				ENABLE_JDK=`rpm -qi ${DEFAULT_JDK_LIST} | grep "Version" | awk '{print $3}'`
 			fi
 	
-			echo "${FUNCT_CATEGORY}|${HOSTNAME}|${CHECK_PLATFORM}|${OS_FAMILY}|${OS_VER}|${ENABLE_JDK}|${GCC_VER}|${GLIBC_VER}|${OPENSSL_VER}"
+			echo "${FUNCT_CATEGORY}|${HOSTNAME}|${CHECK_PLATFORM}|${OS_NAME}|${OS_VER}|${ENABLE_JDK}|${GCC_VER}|${GLIBC_VER}|${OPENSSL_VER}"
 		else
 			declare -a ARRAY_JDK_LIST
 	
@@ -349,7 +370,7 @@ else
 			SORT_UNIQ_JDK=`printf "%s\n" "${ARRAY_JDK_LIST[@]}" | sort -u | uniq`
 			for ENABLE_JDK in ${SORT_UNIQ_JDK}
 			do
-				echo "${FUNCT_CATEGORY}|${HOSTNAME}|${CHECK_PLATFORM}|${OS_FAMILY}|${OS_VER}|${ENABLE_JDK}|${GCC_VER}|${GLIBC_VER}|${OPENSSL_VER}"
+				echo "${FUNCT_CATEGORY}|${HOSTNAME}|${CHECK_PLATFORM}|${OS_NAME}|${OS_VER}|${ENABLE_JDK}|${GCC_VER}|${GLIBC_VER}|${OPENSSL_VER}"
 			done
 		fi
 	}
