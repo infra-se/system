@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by  helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Manual CI Collect Script"
-SCRIPT_VERSION=0.2.20240125
+SCRIPT_VERSION=0.3.20250306
 
 WORK_PATH=/root/shell/MANUAL_CI_COLLECT
 LOG_DIR=${WORK_PATH}/logs
