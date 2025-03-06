@@ -72,7 +72,7 @@ if [ ${OS_FAMILY} == "ROCKY" ]
 then
 	INSTALL_DATE_UNIXTIME=`rpm -qa --qf '%{installtime}\n' coreutils`
 else
-	INSTALL_DATE_UNIXTIME=`date -d "$(uptime -s)" +%s`
+	INSTALL_DATE_UNIXTIME=`date -d "$(grep -i "install" /var/log/cloud-init.log | tail -1 | cut -d "," -f1)" +%s`
 fi
 
 INSTALL_DATE_NATIVE=`FUNCT_NATIVE_DATE ${INSTALL_DATE_UNIXTIME}`
