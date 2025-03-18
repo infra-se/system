@@ -1,4 +1,4 @@
-# [ 설명 ]
+## [ 설명 ]
 이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다.
 현재 20개 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 변경 중에 있습니다.
 
@@ -25,12 +25,12 @@ HTTP request sent, awaiting response... 200 OK
 Length: 1746 (1.7K) [text/plain]
 Saving to: ‘STDOUT’
 
-100%[=======================================================================================================================================================================>] 1,746       --.-K/s   in 0s      
+100%[=============================================================================>] 1,746       --.-K/s   in 0s      
 
 2025-03-11 20:51:49 (46.2 MB/s) - written to stdout [1746/1746]
 
 
-[INFO] Script Path Initialize : /root/shell/MANUAL_CI_COLLECT 
+[INFO] Script Path Initialize : /root/shell/KISA_SECURITY 
 Cloning into 'system'...
 remote: Enumerating objects: 569, done.
 remote: Counting objects: 100% (55/55), done.
