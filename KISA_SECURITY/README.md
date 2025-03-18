@@ -98,7 +98,8 @@ drwxr-xr-x 2 root root  6 Mar  5 15:00 service
 [root@centos01 CONF_BACKUP]# 
 ```
 
-4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다. (현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현됨.)
+4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다. 
+(현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현됨.)
 ```
 [root@centos01 MANUAL_SCRIPT]#
 [root@centos01 MANUAL_SCRIPT]# ./sec_std_conf.sh RESTORE
