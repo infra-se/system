@@ -8,8 +8,8 @@ export LC_ALL=C
 
 WORK_TYPE=$1
 DATE_TIME=`date '+%Y%m%d_%H%M%S'`
-LOG_DIR=/root/shell/logs
-COMMON_VARS_DIR=/root/shell/MANUAL_SCRIPT
+LOG_DIR=/root/shell/KISA_SECURITY/logs
+COMMON_VARS_DIR=/root/shell/KISA_SECURITY
 COMMON_VARS=${COMMON_VARS_DIR}/common
 BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP
 BACKUP_SERVICE_DIR=/root/shell/CONF_BACKUP/service
