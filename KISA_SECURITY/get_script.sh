@@ -59,7 +59,7 @@ then
 	cd ${WORK_PATH}
 
 	echo
-	echo "[INFO] Script Path Initialize : ${WORK_PATH}/MANUAL_CI_COLLECT "
+	echo "[INFO] Script Path Initialize : ${WORK_PATH}/KISA_SECURITY"
 	rm -rf ${WORK_PATH}/KISA_SECURITY
 
 	git clone https://github.com/infra-se/system.git
@@ -70,7 +70,7 @@ then
 	mkdir -p ${WORK_PATH}/KISA_SECURITY/logs
 
 	echo
-	echo "[INFO] Script Download Path : ${WORK_PATH}/MANUAL_CI_COLLECT "
+	echo "[INFO] Script Download Path : ${WORK_PATH}/KISA_SECURITY"
  	rm -f ${WORK_PATH}/KISA_SECURITY/get_script.sh
 	find ${WORK_PATH}/KISA_SECURITY -type f
 	echo
