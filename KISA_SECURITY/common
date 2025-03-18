@@ -1,0 +1,52 @@
+#!/bin/bash
+#Script made by helperchoi@gmail.com
+SCRIPT_DESCRIPTION="COMMON VARIABLE for KISA Vulnerability Diagnosis Automation Script"
+SCRIPT_VERSION=0.2.20250318
+
+###############################################################################
+
+MOTD_MESSAGE="
+===========================================================================
+본 시스템은 허가된 사용자만 이용하실수 있습니다. 
+부당한 방법으로 시스템에 접속하거나 정보를 삭제/변경/유출하는 
+사용자는 관련법령에 따라 처벌 받게 됩니다.
+
+This is a private computer facility. 
+Access for any reason must be specifically authorized by the manager. 
+Unless you are so authorized, your continued access and any other use may 
+expose you to criminaland or civil proceedings
+===========================================================================
+"
+
+###############################################################################
+
+ACCOUNT_AUTH_ROCKY="
+auth        required      pam_env.so
+auth	    required      pam_faillock.so deny=5 unlock_time=300
+auth        sufficient    pam_unix.so try_first_pass nullok
+auth        required      pam_deny.so
+
+account     required      pam_unix.so
+account     required      pam_faillock.so
+
+password    requisite     pam_pwquality.so try_first_pass local_users_only retry=3 authtok_type=
+password    sufficient    pam_unix.so try_first_pass use_authtok nullok sha512 shadow
+password    required      pam_deny.so
+
+session     optional      pam_keyinit.so revoke
+session     required      pam_limits.so
+-session     optional      pam_systemd.so
+session     [success=1 default=ignore] pam_succeed_if.so service in crond quiet use_uid
+session     required      pam_unix.so
+"
+
+###############################################################################
+
+ACCOUNT_AUTH_UBUNTU="
+auth	[success=1 default=ignore]	pam_unix.so nullok
+auth	requisite			pam_deny.so
+auth	required			pam_permit.so deny=5 unlock_time=300
+auth	optional			pam_cap.so 
+"
+
+###############################################################################
