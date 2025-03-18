@@ -1,12 +1,14 @@
 ## [ 설명 ]
 이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다.  
 (https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
+
 25년 3월 18일자 기준 20개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
 
 ## [ 사용법 ]
 
 1. 시스템에 root 로 Login 하거나 root 스위칭을 합니다. (or sudo -i)
-2. 다음과 같은 명령을 활용해 Script를 Download 및 설치 합니다.  
+2. 다음과 같은 명령을 활용해 Script를 Download 및 설치 합니다.
+
 wget -O - https://github.com/infra-se/system/blob/main/KISA_SECURITY/get_script.sh?raw=true | bash
 ```
 [root@centos01 ~]# 
