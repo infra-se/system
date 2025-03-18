@@ -6,6 +6,7 @@
 
 1. 시스템에 root 로 Login 하거나 root 스위칭을 합니다. (or sudo -i)
 2. 다음과 같은 명령을 활용해 Script를 Download 및 설치 합니다.
+
 wget -O - https://github.com/infra-se/system/blob/main/KISA_SECURITY/get_script.sh?raw=true | bash
 ```
 [root@centos01 ~]# 
