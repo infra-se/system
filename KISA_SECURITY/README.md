@@ -39,7 +39,7 @@ remote: Total 569 (delta 43), reused 34 (delta 34), pack-reused 514 (from 1)
 Receiving objects: 100% (569/569), 179.66 KiB | 0 bytes/s, done.
 Resolving deltas: 100% (333/333), done.
 
-[INFO] Script Download Path : /root/shell/MANUAL_CI_COLLECT 
+[INFO] Script Download Path : /root/shell/KISA_SECURITY 
 /root/shell/KISA_SECURITY/common
 /root/shell/KISA_SECURITY/sec_std_conf.sh
 
