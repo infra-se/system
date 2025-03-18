@@ -919,7 +919,72 @@ FUNCT_U14() {
 	fi
 }
 
+FUNCT_U15() {
+	WORK_TYPE=$1
 
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
+		find / ! \( \( -path '/proc' -o -path '/root/shell/CONF_BACKUP' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/sys' \) -prune \) -type f -perm -2 -exec ls -1 {} \; > ${TARGET_LIST}
+
+		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		if [ ${CHECK_TARGET_OBJECT} -gt 0 ]
+		then
+			for LIST in `cat ${TARGET_LIST}`
+			do
+				FUNCT_CHECK_FILE ${LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} File is World Writable Permission : ${LIST}"
+					FUNCT_CHECK_PERM ${LIST}
+					FUNCT_BACKUP_PERM ${LIST}
+				else
+					echo "[INFO] ${HOSTNAME} ${LIST} file does not exist : OK"
+				fi
+				
+				################ Independent Processing Logic [ BEGIN ] ################
+	
+				echo "[INFO] ${HOSTNAME} Change File Permission (chmod o-w) : ${LIST}"
+				chmod o-w ${LIST}
+				echo
+	
+				################ Independent Processing Logic [ END ] ################
+			done
+		else
+			echo "[INFO] ${HOSTNAME} This System is U-15 Check OK"
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then	
+		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
+		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		if [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -gt 0 ]
+		then
+			for LIST in `cat ${TARGET_LIST}`
+			do
+				FUNCT_CHECK_FILE ${LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_CHECK_PERM_BACKUP ${LIST}
+					FUNCT_RESTORE_PERM ${LIST} ALL
+				fi
+			done
+
+		elif [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -eq 0 ]
+		then
+			echo "[INFO] ${HOSTNAME} Backup File Not found."
+		else
+			echo "[INFO] ${HOSTNAME} Backup File Not found."
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 
 FUNCT_U22() {
@@ -1037,6 +1102,10 @@ FUNCT_MAIN_PROCESS() {
 	
 	echo "### PROCESS U14 ###"
 	FUNCT_U14 ${WORK_TYPE}
+	echo
+	
+  	echo "### PROCESS U15 ###"
+	FUNCT_U15 ${WORK_TYPE}
 	echo
 	
 	echo "### PROCESS U22 ###"
