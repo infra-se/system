@@ -1,6 +1,5 @@
 ## [ 설명 ]
-이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다.
-(https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)
+이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다(https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)
 
 25년 3월 18일자 기준 20개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
 
@@ -98,7 +97,7 @@ drwxr-xr-x 2 root root  6 Mar  5 15:00 service
 [root@centos01 CONF_BACKUP]# 
 ```
 
-4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다. 
+4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다.
 (현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현됨.)
 ```
 [root@centos01 MANUAL_SCRIPT]#
