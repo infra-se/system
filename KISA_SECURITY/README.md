@@ -1,13 +1,12 @@
 ## [ 설명 ]
-이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다 
- (https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
+이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 자동화 진단 및 조치를 수행하는 Script 입니다.  
+(https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
 25년 3월 18일자 기준 20개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
 
 ## [ 사용법 ]
 
 1. 시스템에 root 로 Login 하거나 root 스위칭을 합니다. (or sudo -i)
-2. 다음과 같은 명령을 활용해 Script를 Download 및 설치 합니다.
-
+2. 다음과 같은 명령을 활용해 Script를 Download 및 설치 합니다.  
 wget -O - https://github.com/infra-se/system/blob/main/KISA_SECURITY/get_script.sh?raw=true | bash
 ```
 [root@centos01 ~]# 
@@ -47,8 +46,7 @@ Resolving deltas: 100% (333/333), done.
 [root@centos01 ~]# 
 [root@centos01 ~]#
 ```
-3. 아래와 같이 Script 실행시 실행 (PROC) / 복구 (RESTORE) 옵션을 입력하여 실행을 수행하며 (진단 및 조치 자동화)
-
+3. 아래와 같이 Script 실행시 실행 (PROC) / 복구 (RESTORE) 옵션을 입력하여 실행을 수행하며 (진단 및 조치 자동화)  
 취약점 조치 작업에 의한 시스템 이상 발생시 작업전 형상 복구를 위해 Script 실행시 기본적으로 관련 File 및 권한정보를 백업하도록 Logic화 되어있습니다.
 
 ```
@@ -97,7 +95,7 @@ drwxr-xr-x 2 root root  6 Mar  5 15:00 service
 [root@centos01 CONF_BACKUP]# 
 ```
 
-4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다.
+4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다.  
 (현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현됨.)
 ```
 [root@centos01 MANUAL_SCRIPT]#
