@@ -1210,7 +1210,23 @@ FUNCT_MAIN_PROCESS() {
 ##############################################################################
 
 FUNCT_MANDATORY ${WORK_TYPE}
-FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
+
 echo
+echo "[RECOMMEND] Be sure to read the guide document before running."
+echo "https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md"
+echo "[QUESTION] Do you want run Script ? : y or n"
+echo
+read ANSWER
+
+if [ "${ANSWER}" == "y" ]
+then
+	FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
+	echo
+else
+	echo "[INFO] Stop Script Now."
+	echo
+	exit 0
+fi
 
 ##############################################################################
+
