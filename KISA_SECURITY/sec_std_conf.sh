@@ -1214,6 +1214,7 @@ FUNCT_MANDATORY ${WORK_TYPE}
 echo
 echo "[RECOMMEND] Be sure to read the guide document before running."
 echo "https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md"
+echo
 echo "[QUESTION] Do you want run Script ? : y or n"
 echo
 read ANSWER
