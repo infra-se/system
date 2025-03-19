@@ -4,7 +4,8 @@
 
 1. 25년 3월 19일자 기준 22개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
 2. 모든 처리 Logic은 각 기능별로 Function 화 구현해 두었기 때문에 재사용, 분리, 실행 예외 처리 가능합니다.
-3. Script 실행전 KISA Link 문서를 확인 후 아래 예시와 같은 실행 환경 특성에 맞게 예외처리가 필요한 항목을 반드시 확인 후 실행해야 합니다.  
+3. 실제 Script 실행전 KISA Link 문서 확인을 통해 아래 예시와 같이 실행 환경 특성에 맞게 예외처리가 필요한 항목들을 반드시 확인 후 실행해야 합니다.  
+(ex : k8s, docker 등 Container 환경에서 사용되는 OverlayFS 영역등에 적재되는 File 권한은 기본적으로 Container OS에 종속된 계정 UID/GID 값을 기준으로 생성되기 때문에 Woker Node등 Host OS에서는 소유주가 없는 파일로 인식됨. 따라서 U-06 과 같은 소유주가 없는 파일에 대한 삭제 조치는 신중을 기해야하며, 본 Script에서도 삭제 Logic은 주석처리로 막아두고, 내역 표기 및 경고처리를 하도록 되어있음.) 
   
 ![image](https://github.com/user-attachments/assets/ce4417ad-846d-4885-ae74-beca3d6eccd5)
   
