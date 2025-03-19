@@ -7,7 +7,7 @@
 3. 실제 Script 실행전 KISA Link 문서 확인을 통해 아래 예시와 같이 실행 환경 특성에 맞게 예외처리가 필요한 항목들을 반드시 확인 후 실행해야 합니다.  
   
 (예 : k8s, docker 등 Container 환경에서 사용되는 OverlayFS 영역등에 적재되는 File 권한은 기본적으로 Container OS에 종속된 계정 UID/GID 값을 기준으로 생성되기 때문에 Woker Node등 Host OS에서는 소유주가 없는 파일로 인식됨.  
-따라서 U-06 취약점 항목과 같이 소유주가 없는 파일에 대한 삭제 조치는 신중을 기해야하며, 본 Script에서도 삭제 Logic은 주석처리로 막아두고, 내역 표기 및 경고처리를 하도록 되어있음.)  
+따라서 U-06 취약점 항목과 같은 소유주가 없는 파일에 대한 식별 및 삭제 조치를 취하는 항목의 실행에 대해서는 신중을 기해야하며, 본 Script에서도 삭제 Logic은 주석처리로 막아두고, 내역 표기 및 경고처리를 하도록 되어있음.)  
   
 ![image](https://github.com/user-attachments/assets/dc058820-49ac-413f-a789-d58f91e2121e)
   
