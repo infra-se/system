@@ -287,11 +287,16 @@ FUNCT_RESTORE_SERVICE() {
 }
 
 
-##############################
+###################################
 ###### MAIN PROCESS FUNCTION ######
-##############################
+###################################
 
 FUNCT_U01() {
+	echo
+	#########################
+	echo "### PROCESS U01 ###"
+	#########################
+
 	WORK_TYPE=$1
 	TARGET_LIST=/etc/ssh/sshd_config
 
@@ -345,6 +350,11 @@ FUNCT_U01() {
 
 
 FUNCT_U02() {
+	echo
+	#########################
+	echo "### PROCESS U02 ###"
+	#########################
+
 	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
@@ -455,6 +465,11 @@ FUNCT_U02() {
 
 
 FUNCT_U03() {
+	echo
+	#########################
+	echo "### PROCESS U03 ###"
+	#########################
+
 	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
@@ -538,6 +553,11 @@ EOF
 
 
 FUNCT_U04() {
+	echo
+	#########################
+	echo "### PROCESS U04 ###"
+	#########################
+
 	WORK_TYPE=$1
 	TARGET_LIST=/etc/shadow
 
@@ -561,6 +581,11 @@ FUNCT_U04() {
 }
 
 FUNCT_U05() {
+	echo
+	#########################
+	echo "### PROCESS U05 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	if [ ${WORK_TYPE} == "PROC" ]
@@ -587,6 +612,11 @@ FUNCT_U05() {
 
 
 FUNCT_U06() {
+	echo
+	#########################
+	echo "### PROCESS U06 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	if [ ${WORK_TYPE} == "PROC" ]
@@ -638,6 +668,11 @@ FUNCT_U06() {
 
 
 FUNCT_U08() {
+	echo
+	#########################
+	echo "### PROCESS U08 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	PERM_400_LIST="
@@ -687,6 +722,11 @@ FUNCT_U08() {
 
 
 FUNCT_U09() {
+	echo
+	#########################
+	echo "### PROCESS U07, U09, U10, U12 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	PERM_600_LIST="
@@ -790,6 +830,11 @@ FUNCT_U09() {
 
 
 FUNCT_U11() {
+	echo
+	#########################
+	echo "### PROCESS U11 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	PERM_640_LIST="
@@ -839,6 +884,11 @@ FUNCT_U11() {
 
 
 FUNCT_U13() {
+	echo
+	#########################
+	echo "### PROCESS U13 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	WORK_LIST="
@@ -890,6 +940,11 @@ FUNCT_U13() {
 
 
 FUNCT_U14() {
+	echo
+	#########################
+	echo "### PROCESS U14 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	TARGET_LIST=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
@@ -919,7 +974,13 @@ FUNCT_U14() {
 	fi
 }
 
+
 FUNCT_U15() {
+	echo
+	#########################
+	echo "### PROCESS U15 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	if [ ${WORK_TYPE} == "PROC" ]
@@ -986,7 +1047,13 @@ FUNCT_U15() {
 	fi
 }
 
+
 FUNCT_U16() {
+	echo
+	#########################
+	echo "### PROCESS U16 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	if [ ${WORK_TYPE} == "PROC" ]
@@ -1042,7 +1109,14 @@ FUNCT_U16() {
 	fi
 }
 
+
+
 FUNCT_U22() {
+	echo
+	#########################
+	echo "### PROCESS U22 ###"
+	#########################
+
 	WORK_TYPE=$1
 
 	PERM_640_LIST="
@@ -1115,62 +1189,20 @@ FUNCT_MAIN_PROCESS() {
 	#### Main Process Flow ####
 	###########################
 	
-	echo "### PROCESS U01 ###"
 	FUNCT_U01 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U02 ###"
 	FUNCT_U02 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U03 ###"
 	FUNCT_U03 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U04 ###"
 	FUNCT_U04 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U05 ###"
 	FUNCT_U05 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U06 ###"
 	FUNCT_U06 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U08 ###"
 	FUNCT_U08 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U07, U09, U10, U12 ###"
-	FUNCT_U09 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U11 ###"
+	FUNCT_U09 ${WORK_TYPE} ### with U07, U10, U12 ###
 	FUNCT_U11 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U13 ###"
 	FUNCT_U13 ${WORK_TYPE}
-	echo
-	
-	echo "### PROCESS U14 ###"
 	FUNCT_U14 ${WORK_TYPE}
-	echo
-	
-  	echo "### PROCESS U15 ###"
 	FUNCT_U15 ${WORK_TYPE}
-	echo
-
-	echo "### PROCESS U16 ###"
 	FUNCT_U16 ${WORK_TYPE}
-	echo
- 
-	echo "### PROCESS U22 ###"
 	FUNCT_U22 ${WORK_TYPE}
-	echo
-	
 }
 
 FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
