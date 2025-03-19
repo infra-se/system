@@ -2,8 +2,14 @@
 이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 진단 및 조치를 자동화 수행하는 Script 입니다.  
 (https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
 
-25년 3월 19일자 기준 22개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
+1. 25년 3월 19일자 기준 22개 취약점 항목에 대해서 자동화 조치 구현 완료하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
+2. 모든 처리 Logic은 각 기능별로 Function 화 구현해 두었기 때문에 재사용, 분리, 실행 예외 처리 가능합니다.
+3. Script 실행전 KISA Link 문서를 확인 후 아래 예시와 같은 실행 예외처리가 필요한 항목을 반드시 확인하셔야 합니다.  
+![image](https://github.com/user-attachments/assets/ce4417ad-846d-4885-ae74-beca3d6eccd5)
+4. 실행 예외가 필요한 항목이 확인되면, 아래 예시와 같이 Script 맨 하단부 FUNCT_MAIN_PROCESS 영역에서 대상 항목에 대해 간단히 주석처리를 통해 예외 처리 가능합니다.  
+![image](https://github.com/user-attachments/assets/fa42e5ce-f87e-4363-8583-4538315d0a3d)
 
+  
 ## [ 사용법 ]
 
 1. 시스템에 root 로 Login 하거나 root 계정으로 스위칭을 수행 합니다. (ex : sudo -i)
