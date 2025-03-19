@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.7.20250318
+SCRIPT_VERSION=0.8.20250319
 
 export LANG=C
 export LC_ALL=C
@@ -986,6 +986,61 @@ FUNCT_U15() {
 	fi
 }
 
+FUNCT_U16() {
+	WORK_TYPE=$1
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		TARGET_LIST=${BACKUP_ROOT_DIR}/DEV_UNACCEPTABLE_LIST
+		find /dev/ -type f -exec ls -1 {} \; > ${TARGET_LIST}
+
+		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		if [ ${CHECK_TARGET_OBJECT} -gt 0 ]
+		then
+			for LIST in `cat ${TARGET_LIST}`
+			do
+				FUNCT_CHECK_FILE ${LIST}
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					################ Independent Processing Logic [ BEGIN ] ################
+
+					echo "[WARN] ${HOSTNAME} Not allowed file in the /dev : ${LIST}"
+					FUNCT_BACKUP_FILE ${LIST}
+					echo "[INFO] ${HOSTNAME} Delete File : ${LIST}"
+					rm -f ${LIST}
+	
+					################ Independent Processing Logic [ END ] ################
+				else
+					echo "[OK] ${HOSTNAME} Does not exist : ${LIST}" 
+				fi
+			done
+		else
+			echo "[INFO] ${HOSTNAME} This System is U-16 Check OK"
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then	
+		TARGET_LIST=${BACKUP_ROOT_DIR}/DEV_UNACCEPTABLE_LIST
+		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		if [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -gt 0 ]
+		then
+			for LIST in `cat ${TARGET_LIST}`
+			do
+				FUNCT_RESTORE_FILE ${LIST}
+			done
+		elif [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -eq 0 ]
+		then
+			echo "[INFO] ${HOSTNAME} Backup File Not found."
+		else
+			echo "[INFO] ${HOSTNAME} Backup File Not found."
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 FUNCT_U22() {
 	WORK_TYPE=$1
@@ -1088,7 +1143,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U08 ${WORK_TYPE}
 	echo
 	
-	echo "### PROCESS U09 ###"
+	echo "### PROCESS U07, U09, U10, U12 ###"
 	FUNCT_U09 ${WORK_TYPE}
 	echo
 	
@@ -1107,7 +1162,11 @@ FUNCT_MAIN_PROCESS() {
   	echo "### PROCESS U15 ###"
 	FUNCT_U15 ${WORK_TYPE}
 	echo
-	
+
+	echo "### PROCESS U16 ###"
+	FUNCT_U16 ${WORK_TYPE}
+	echo
+ 
 	echo "### PROCESS U22 ###"
 	FUNCT_U22 ${WORK_TYPE}
 	echo
