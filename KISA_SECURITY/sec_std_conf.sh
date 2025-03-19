@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.8.20250319
+SCRIPT_VERSION=0.9.20250319
 
 export LANG=C
 export LC_ALL=C
@@ -16,60 +16,62 @@ BACKUP_SERVICE_DIR=/root/shell/CONF_BACKUP/service
 BACKUP_PERMISSION_DIR=/root/shell/CONF_BACKUP/permission
 mkdir -p ${LOG_DIR} ${COMMON_VARS_DIR} ${BACKUP_ROOT_DIR} ${BACKUP_SERVICE_DIR} ${BACKUP_PERMISSION_DIR}
 
-if [ "${USER}" != "root" ]
-then
-	echo
-	echo "[ERROR] This script must be used in a Only 'root' Account."
-	echo
-	exit 1
-fi
-
-if [ -z ${WORK_TYPE} ]
-then
-	echo "[ERROR] WORK TYPE was not Input."
-	echo
-	echo "### 1. Input Work Type : Only PROC or RESTORE ###"
-	echo
-	echo "Usage ) : $0 PROC"
-	echo
-	exit 1
-elif [ $# -eq 1 ]
-then
-	if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+FUNCT_MANDATORY() {
+	if [ "${USER}" != "root" ]
 	then
-		export CHECK_WORK_TYPE=0
-	else
-		export CHECK_WORK_TYPE=1
+		echo
+		echo "[ERROR] This script must be used in a Only 'root' Account."
+		echo
+		exit 1
+	fi
 
+	if [ -z ${WORK_TYPE} ]
+	then
+		echo "[ERROR] WORK TYPE was not Input."
 		echo
 		echo "### 1. Input Work Type : Only PROC or RESTORE ###"
 		echo
 		echo "Usage ) : $0 PROC"
 		echo
+		exit 1
 
+	elif [ $# -eq 1 ]
+	then
+		if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+		then
+			export CHECK_WORK_TYPE=0
+		else
+			export CHECK_WORK_TYPE=1
+
+			echo
+			echo "### 1. Input Work Type : Only PROC or RESTORE ###"
+			echo
+			echo "Usage ) : $0 PROC"
+			echo
+
+			exit 1
+		fi
+	else
+		echo
+		echo "### 1. Input Work Type : Only PROC or RESTORE ###"
+		echo
+		echo "Usage ) : $0 PROC"
+		echo
 		exit 1
 	fi
-else
-	echo
-	echo "### 1. Input Work Type : Only PROC or RESTORE ###"
-	echo
-	echo "Usage ) : $0 PROC"
-	echo
-	exit 1
-fi
 
+	#############################
+	###### COMMON FUNCTION ######
+	#############################
 
-#############################
-###### COMMON FUNCTION ######
-#############################
-
-if [ -e ${COMMON_VARS} ]
-then
-	source ${COMMON_VARS}
-else
-	echo "[ERROR] Need to Common Variable File : ${COMMON_VARS}"
-	exit 1
-fi
+	if [ -e ${COMMON_VARS} ]
+	then
+		source ${COMMON_VARS}
+	else
+		echo "[ERROR] Need to Common Variable File : ${COMMON_VARS}"
+		exit 1
+	fi
+}
 
 FUNCT_CHECK_OS() {
 
@@ -1205,4 +1207,10 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U22 ${WORK_TYPE}
 }
 
+##############################################################################
+
+FUNCT_MANDATORY ${WORK_TYPE}
 FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
+echo
+
+##############################################################################
