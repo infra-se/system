@@ -76,7 +76,7 @@ FUNCT_MANDATORY() {
 
 FUNCT_CHECK_OS() {
 
-	CHECK_OS=`uname -a | cut -d "/" -f 2 | tr '[A-Z]' '[a-z]'`
+	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
 
 	if [ $CHECK_OS = "linux" ];
 	then
