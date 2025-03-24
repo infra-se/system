@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="COMMON VARIABLE for KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.2.20250318
+SCRIPT_VERSION=0.2.20250324
 
 ###############################################################################
 
@@ -20,7 +20,7 @@ expose you to criminaland or civil proceedings
 
 ###############################################################################
 
-ACCOUNT_AUTH_ROCKY="
+ACCOUNT_AUTH_RHEL="
 auth        required      pam_env.so
 auth	    required      pam_faillock.so deny=5 unlock_time=300
 auth        sufficient    pam_unix.so try_first_pass nullok
