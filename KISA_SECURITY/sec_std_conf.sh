@@ -76,7 +76,6 @@ FUNCT_MANDATORY() {
 		echo
 		exit 1
 	else
-		FUNCT_CHECK_OS
 		FUNCT_CHECK_CMD bc
 		if [ ${CHECK_CMD_RESULT} -eq 1 ]
 		then
@@ -408,7 +407,6 @@ FUNCT_U02() {
 	echo "### PROCESS U02 ###"
 	#########################
 
-	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
 	if [ ${OS_PLATFORM} == "RHEL" ]
@@ -523,7 +521,6 @@ FUNCT_U03() {
 	echo "### PROCESS U03 ###"
 	#########################
 
-	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
 	if [ ${OS_PLATFORM} == "RHEL" ]
@@ -1345,6 +1342,7 @@ FUNCT_MAIN_PROCESS() {
 
 ##############################################################################
 
+FUNCT_CHECK_OS
 FUNCT_MANDATORY ${WORK_TYPE}
 
 echo
