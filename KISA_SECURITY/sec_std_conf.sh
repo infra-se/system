@@ -1,13 +1,13 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250319
+SCRIPT_VERSION=0.9.20250324
 
 export LANG=C
 export LC_ALL=C
 
 WORK_TYPE=$1
-DATE_TIME=`date '+%Y%m%d_%H%M%S'`
+readonly DATE_TIME=`date '+%Y%m%d_%H%M%S'`
 LOG_DIR=/root/shell/KISA_SECURITY/logs
 COMMON_VARS_DIR=/root/shell/KISA_SECURITY
 COMMON_VARS=${COMMON_VARS_DIR}/common
@@ -20,14 +20,15 @@ FUNCT_MANDATORY() {
 	if [ "${USER}" != "root" ]
 	then
 		echo
-		echo "[ERROR] This script must be used in a Only 'root' Account."
+		echo "[ERROR] ${HOSTNAME} This script must be used in a Only 'root' Account."
 		echo
 		exit 1
 	fi
 
 	if [ -z ${WORK_TYPE} ]
 	then
-		echo "[ERROR] WORK TYPE was not Input."
+		echo
+		echo "[ERROR] ${HOSTNAME} WORK TYPE was not Input."
 		echo
 		echo "### 1. Input Work Type : Only PROC or RESTORE ###"
 		echo
@@ -68,7 +69,7 @@ FUNCT_MANDATORY() {
 	then
 		source ${COMMON_VARS}
 	else
-		echo "[ERROR] Need to Common Variable File : ${COMMON_VARS}"
+		echo "[ERROR] ${HOSTNAME} Need to Common Variable File : ${COMMON_VARS}"
 		exit 1
 	fi
 }
@@ -79,14 +80,15 @@ FUNCT_CHECK_OS() {
 
 	if [ $CHECK_OS = "linux" ];
 	then
-		if [ `grep -i "ubuntu" /etc/*-release| wc -l` -gt 0 ]
-		then
-			export OS_PLATFORM="UBUNTU"
-		else
-			export OS_PLATFORM="ROCKY"
-		fi
+		source /etc/os-release
+		case "$ID" in
+			ubuntu) OS_PLATFORM="UBUNTU" ;;
+			rocky) OS_PLATFORM="RHEL" ;;
+			centos) OS_PLATFORM="RHEL" ;;
+			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
+		esac
 	else
-		echo "[Error] Can not execute. run script is only Linux OS"
+		echo "[ERROR] ${HOSTNAME} Can not execute. run script is only Linux OS"
 		exit 1
 	fi
 }
@@ -360,10 +362,10 @@ FUNCT_U02() {
 	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
-	if [ ${OS_PLATFORM} == "ROCKY" ]
+	if [ ${OS_PLATFORM} == "RHEL" ]
 	then
 		#####################
-		#### ROCKY LINUX ####
+		#### RHEL LINUX ####
 		#####################
 
 		TARGET_LIST=/etc/security/pwquality.conf
@@ -413,7 +415,7 @@ FUNCT_U02() {
 			fi
 
 		else
-			echo "[ERROR] Input Work type is Only PROC or RESTORE"
+			echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 			exit 1
 		fi
 	else
@@ -459,7 +461,7 @@ FUNCT_U02() {
 			fi
 
 		else
-			echo "[ERROR] Input Work type is Only PROC or RESTORE"
+			echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 			exit 1
 		fi
 	fi
@@ -475,10 +477,10 @@ FUNCT_U03() {
 	FUNCT_CHECK_OS
 	WORK_TYPE=$1
 
-	if [ ${OS_PLATFORM} == "ROCKY" ]
+	if [ ${OS_PLATFORM} == "RHEL" ]
 	then
 		#####################
-		#### ROCKY LINUX ####
+		#### RHEL LINUX ####
 		#####################
 
 		TARGET_LIST=/etc/pam.d/system-auth
@@ -495,7 +497,7 @@ FUNCT_U03() {
 				echo "[INFO] ${HOSTNAME} Processing Password Lock : ${TARGET_LIST}"
 
 				cat > ${TARGET_LIST} << EOF
-				${ACCOUNT_AUTH_ROCKY}
+				${ACCOUNT_AUTH_RHEL}
 EOF
 
 				################ Independent Processing Logic [ END ] ################
@@ -510,7 +512,7 @@ EOF
 			fi
 
 		else
-			echo "[ERROR] Input Work type is Only PROC or RESTORE"
+			echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 			exit 1
 		fi
 	else
@@ -547,7 +549,7 @@ EOF
 			fi
 
 		else
-			echo "[ERROR] Input Work type is Only PROC or RESTORE"
+			echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 			exit 1
 		fi
 	fi
@@ -575,9 +577,9 @@ FUNCT_U04() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] There is no recovery option for Function U04."
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U04."
 	else
-		echo "[ERROR] Input Work type is Only PROC or RESTORE"
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
 	fi
 }
@@ -605,9 +607,9 @@ FUNCT_U05() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] There is no recovery option for Function U05."
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U05."
 	else
-		echo "[ERROR] Input Work type is Only PROC or RESTORE"
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
 	fi
 }
@@ -969,9 +971,9 @@ FUNCT_U14() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] There is no recovery option for Function U14."
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U14."
 	else
-		echo "[ERROR] Input Work type is Only PROC or RESTORE"
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
 	fi
 }
@@ -1219,7 +1221,7 @@ echo "[QUESTION] Do you want run Script ? : y or n"
 echo
 read ANSWER
 
-if [ "${ANSWER}" == "y" ]
+if [ "${ANSWER}" == "y" -o "${ANSWER}" == "Y" ]
 then
 	FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
 	echo
@@ -1230,4 +1232,3 @@ else
 fi
 
 ##############################################################################
-
