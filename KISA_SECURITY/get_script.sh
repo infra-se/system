@@ -1,24 +1,27 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Get KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VER=0.4.20250318
+SCRIPT_VER=0.5.20250324
 
 export LANG=C
 export LC_ALL=C
 
 FUNCT_CHECK_OS() {
-	CHECK_OS=`uname -a | cut -d "/" -f 2 | tr '[A-Z]' '[a-z]'`
+	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
 
 	if [ $CHECK_OS = "linux" ];
 	then
-		if [ `grep -i "ubuntu" /etc/*-release| wc -l` -gt 0 ]
-		then
-			export OS_PLATFORM="UBUNTU"
-		else
-			export OS_PLATFORM="ROCKY"
-		fi
+		source /etc/os-release
+		case "$ID" in
+			ubuntu) OS_PLATFORM="UBUNTU" ;;
+			rocky) OS_PLATFORM="RHEL" ;;
+			centos) OS_PLATFORM="RHEL" ;;
+			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
+		esac
+
+		export OS_VERSION=${VERSION_ID}
 	else
-		echo "[Error] Can not execute. run script is only Linux OS"
+		echo "[ERROR] ${HOSTNAME} Can not execute. run script is only Linux OS"
 		exit 1
 	fi
 }
@@ -42,7 +45,7 @@ then
 
 	if [ ${CHECK_RESULT} -eq 1 ]
  	then
-		if [ ${OS_PLATFORM} == "ROCKY" ]
+		if [ ${OS_PLATFORM} == "RHEL" ]
   		then
 			yum -y install git
     		elif [ ${OS_PLATFORM} == "UBUNTU" ]
