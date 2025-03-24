@@ -16,6 +16,58 @@ BACKUP_SERVICE_DIR=/root/shell/CONF_BACKUP/service
 BACKUP_PERMISSION_DIR=/root/shell/CONF_BACKUP/permission
 mkdir -p ${LOG_DIR} ${COMMON_VARS_DIR} ${BACKUP_ROOT_DIR} ${BACKUP_SERVICE_DIR} ${BACKUP_PERMISSION_DIR}
 
+
+#############################
+###### COMMON FUNCTION ######
+#############################
+
+FUNCT_CHECK_OS() {
+	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
+
+	if [ $CHECK_OS = "linux" ];
+	then
+		source /etc/os-release
+		case "$ID" in
+			ubuntu) OS_PLATFORM="UBUNTU" ;;
+			rocky) OS_PLATFORM="RHEL" ;;
+			centos) OS_PLATFORM="RHEL" ;;
+			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
+		esac
+
+		export OS_VERSION=${VERSION_ID}
+	else
+		echo "[ERROR] ${HOSTNAME} Can not execute. run script is only Linux OS"
+		exit 1
+	fi
+}
+
+FUNCT_CHECK_CMD() {
+        TARGET_LIST=$1
+	which ${TARGET_LIST} > /dev/null 2>&-
+
+        if [ $? -eq 0 ]
+        then
+                export CHECK_CMD_RESULT=0
+        else
+                export CHECK_CMD_RESULT=1
+        fi
+}
+
+FUNCT_CHECK_COMPARE() {
+	USER_VAL=$1
+	COMPARE_NUMBER=$2
+	
+	DIFF=`echo "${USER_VAL} >= ${COMPARE_NUMBER}" | bc`
+	if [ "${DIFF}" -eq 1 ];
+	then
+		#### OK ####
+		CHECK_COMPARE_RESULT=0
+	else
+		#### Not OK ####
+		CHECK_COMPARE_RESULT=1
+	fi
+}
+
 FUNCT_MANDATORY() {
 	if [ "${USER}" != "root" ]
 	then
@@ -23,6 +75,24 @@ FUNCT_MANDATORY() {
 		echo "[ERROR] ${HOSTNAME} This script must be used in a Only 'root' Account."
 		echo
 		exit 1
+	else
+		FUNCT_CHECK_OS
+		FUNCT_CHECK_CMD bc
+		if [ ${CHECK_CMD_RESULT} -eq 1 ]
+		then
+			if [ ${OS_PLATFORM} == "RHEL" ]
+		 	then
+				echo "[INFO] ${HOSTNAME} This script requires the 'bc' Command Package."
+				yum -y install bc
+		   	elif [ ${OS_PLATFORM} == "UBUNTU" ]
+		     	then
+				echo "[INFO] ${HOSTNAME} This script requires the 'bc' Command Package."
+				apt-get -y install bc
+		  	else
+				echo "[ERR] ${HOSTNAME} Not Support OS"
+		   		exit 1
+		  	fi
+		fi
 	fi
 
 	if [ -z ${WORK_TYPE} ]
@@ -61,9 +131,6 @@ FUNCT_MANDATORY() {
 		exit 1
 	fi
 
-	#############################
-	###### COMMON FUNCTION ######
-	#############################
 
 	if [ -e ${COMMON_VARS} ]
 	then
@@ -74,24 +141,6 @@ FUNCT_MANDATORY() {
 	fi
 }
 
-FUNCT_CHECK_OS() {
-
-	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
-
-	if [ $CHECK_OS = "linux" ];
-	then
-		source /etc/os-release
-		case "$ID" in
-			ubuntu) OS_PLATFORM="UBUNTU" ;;
-			rocky) OS_PLATFORM="RHEL" ;;
-			centos) OS_PLATFORM="RHEL" ;;
-			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
-		esac
-	else
-		echo "[ERROR] ${HOSTNAME} Can not execute. run script is only Linux OS"
-		exit 1
-	fi
-}
 
 FUNCT_CHECK_FILE() {
 	TARGET_LIST=$1
@@ -1114,6 +1163,90 @@ FUNCT_U16() {
 }
 
 
+FUNCT_U17() {
+	echo
+	#########################
+	echo "### PROCESS U17 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	PERM_600_LIST="
+	/etc/hosts.equiv
+	"
+
+	############ U17 INDEPENDENT FUNCTION BEGIN ############
+	FUNCT_INDEPENDENT_U17() {
+		PERM_600_LIST=$1
+		for LIST in ${PERM_600_LIST}
+		do
+			###########################
+			### FILE CHECK & BACKUP ###
+			###########################
+	
+			FUNCT_CHECK_FILE ${LIST}
+
+			##############################
+			### Change File Permission ###
+			##############################
+	
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then 
+				FUNCT_CHECK_PERM ${LIST}
+				FUNCT_BACKUP_PERM ${LIST}
+				echo "[INFO] ${HOSTNAME} Change File Permission 600 & Owner 'root' : ${LIST}"
+				chmod 600 ${LIST}
+				chown root ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+			fi
+		done
+	}
+	############ U17 INDEPENDENT FUNCTION END ############
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 22.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"	
+			else
+				FUNCT_INDEPENDENT_U17 ${PERM_600_LIST}
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+			else
+				FUNCT_INDEPENDENT_U17 ${PERM_600_LIST}
+			fi
+		fi
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${PERM_600_LIST}
+		do
+			FUNCT_CHECK_FILE ${LIST}
+
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_CHECK_PERM_BACKUP ${LIST}
+				FUNCT_RESTORE_PERM ${LIST} ALL
+			else
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_U22() {
 	echo
@@ -1206,6 +1339,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U14 ${WORK_TYPE}
 	FUNCT_U15 ${WORK_TYPE}
 	FUNCT_U16 ${WORK_TYPE}
+	FUNCT_U17 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
 }
 
