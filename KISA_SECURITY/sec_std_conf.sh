@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250324
+SCRIPT_VERSION=0.9.20250325
 
 export LANG=C
 export LC_ALL=C
