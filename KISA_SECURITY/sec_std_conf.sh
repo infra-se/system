@@ -1232,7 +1232,7 @@ FUNCT_U17() {
 
 		elif [ ${OS_PLATFORM} = "RHEL" ]
 		then
-			FUNCT_CHECK_COMPARE ${OS_VERSION} 8
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
 			then
 				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
