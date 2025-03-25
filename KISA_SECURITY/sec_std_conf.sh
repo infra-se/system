@@ -1168,38 +1168,55 @@ FUNCT_U17() {
 
 	WORK_TYPE=$1
 
-	PERM_600_LIST="
-	/etc/hosts.equiv
-	"
+	############ U17 INDEPENDENT FUNCTION & LOGIC BEGIN ############
+	declare -a ARRAY_TAGET_LIST
+	ARRAY_TAGET_LIST=("/etc/hosts.equiv")
+	ACCOUNT_HOME_DIR_LIST=$(egrep -v "nologin$|false$|shutdown$|halt$|sync$" /etc/passwd | cut -d ':' -f 1 | xargs -i getent passwd {} | cut -d : -f 6)
 
-	############ U17 INDEPENDENT FUNCTION BEGIN ############
-	FUNCT_INDEPENDENT_U17() {
-		PERM_600_LIST=$1
-		for LIST in ${PERM_600_LIST}
+	while IFS= read -r LIST
+	do
+		OBJ_FILE=.rhosts
+		FUNCT_CHECK_FILE ${LIST}/${OBJ_FILE}
+
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			ARRAY_TAGET_LIST+=("${LIST}/${OBJ_FILE}")
+		fi
+	done < <(echo "${ACCOUNT_HOME_DIR_LIST}")
+
+
+	INNER_FUNCT_BACKUP() {
+		for LIST in "${ARRAY_TAGET_LIST[@]}"
 		do
-			###########################
-			### FILE CHECK & BACKUP ###
-			###########################
-	
 			FUNCT_CHECK_FILE ${LIST}
-
-			##############################
-			### Change File Permission ###
-			##############################
-	
 			if [ ${CHECK_RESULT} -eq 0 ]
-			then 
+			then
 				FUNCT_CHECK_PERM ${LIST}
 				FUNCT_BACKUP_PERM ${LIST}
-				echo "[INFO] ${HOSTNAME} Change File Permission 600 & Owner 'root' : ${LIST}"
+				echo "[INFO] ${HOSTNAME} Change File Permission 600 : ${LIST}"
 				chmod 600 ${LIST}
-				chown root ${LIST}
-			else
-				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+
+
+				if [ ${LIST} = "/etc/hosts.equiv" -a ${CHECK_FILE_OWNER} != "root" ]
+				then
+					echo "[INFO] ${HOSTNAME} Change File Owner 'root' : ${LIST}"
+					chown root:root ${LIST}
+
+				elif [ ${LIST} != "/etc/hosts.equiv" ]
+				then
+					BASE_DIR=`dirname ${LIST}`
+					CHECK_ACCOUNT=`grep "${BASE_DIR}" /etc/passwd | cut -d : -f1`
+
+					if [ ${CHECK_FILE_OWNER} != ${CHECK_ACCOUNT} ]
+					then
+						echo "[INFO] ${HOSTNAME} Change File Owner '${CHECK_ACCOUNT}' : ${LIST}"
+						chown ${CHECK_ACCOUNT}:${CHECK_ACCOUNT} ${LIST}
+					fi
+				fi
 			fi
 		done
 	}
-	############ U17 INDEPENDENT FUNCTION END ############
+	############ U17 INDEPENDENT FUNCTION & LOGIC END ############
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
@@ -1210,23 +1227,23 @@ FUNCT_U17() {
 			then
 				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"	
 			else
-				FUNCT_INDEPENDENT_U17 ${PERM_600_LIST}
+				INNER_FUNCT_BACKUP ${ARRAY_TAGET_LIST}
 			fi
 
 		elif [ ${OS_PLATFORM} = "RHEL" ]
 		then
-			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 8
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
 			then
 				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
 			else
-				FUNCT_INDEPENDENT_U17 ${PERM_600_LIST}
+				INNER_FUNCT_BACKUP ${ARRAY_TAGET_LIST}
 			fi
 		fi
 	
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		for LIST in ${PERM_600_LIST}
+		for LIST in "${ARRAY_TAGET_LIST[@]}"
 		do
 			FUNCT_CHECK_FILE ${LIST}
 
