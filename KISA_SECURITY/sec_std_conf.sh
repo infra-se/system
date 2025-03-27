@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250325
+SCRIPT_VERSION=0.9.20250327
 
 export LANG=C
 export LC_ALL=C
@@ -52,6 +52,7 @@ FUNCT_CHECK_CMD() {
                 export CHECK_CMD_RESULT=1
         fi
 }
+
 
 FUNCT_CHECK_COMPARE() {
 	USER_VAL=$1
@@ -336,6 +337,11 @@ FUNCT_RESTORE_SERVICE() {
 	else
 		echo "[INFO] ${HOSTNAME} Service Status Backup is Not Found : ${TARGET_SERVICE}"
 	fi
+}
+
+FUNCT_EXCEPTION() {
+	EXT_MSG="$1"
+	echo "[INFO] ${HOSTNAME} Exception: ${EXT_MSG} : OK"
 }
 
 
@@ -1168,7 +1174,9 @@ FUNCT_U17() {
 
 	WORK_TYPE=$1
 
+
 	############ U17 INDEPENDENT FUNCTION & LOGIC BEGIN ############
+
 	declare -a ARRAY_TAGET_LIST
 	ARRAY_TAGET_LIST=("/etc/hosts.equiv")
 	ACCOUNT_HOME_DIR_LIST=$(egrep -v "nologin$|false$|shutdown$|halt$|sync$" /etc/passwd | cut -d ':' -f 1 | xargs -i getent passwd {} | cut -d : -f 6)
@@ -1260,6 +1268,75 @@ FUNCT_U17() {
 		exit 1
 	fi
 }
+
+
+FUNCT_U18() {
+	echo
+	#########################
+	echo "### PROCESS U18 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+	then
+		EXT_MSG="Physical firewall applied."
+		FUNCT_EXCEPTION "${EXT_MSG}"
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
+FUNCT_U19() {
+	echo
+	#########################
+	echo "### PROCESS U19 ###"
+	#########################
+
+	WORK_TYPE=$1
+	TARGET_LIST=/etc/inetd.conf
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			CHECK_VALUE=`grep "^finger" ${TARGET_LIST} | wc -l`
+
+			if [ ${CHECK_VALUE} -eq 1 ]
+			then
+				FUNCT_BACKUP_FILE ${TARGET_LIST}
+				echo "[INFO] ${HOSTNAME} Disable finger service : ${TARGET_LIST}"
+				sed -i "s/^finger/#finger/g" ${TARGET_LIST}
+			else
+				echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		fi
+
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 
 
 FUNCT_U22() {
@@ -1354,6 +1431,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U15 ${WORK_TYPE}
 	FUNCT_U16 ${WORK_TYPE}
 	FUNCT_U17 ${WORK_TYPE}
+	FUNCT_U18 ${WORK_TYPE} ### Exception : Not need FUNCT_U18 ###
+	FUNCT_U19 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
 }
 
