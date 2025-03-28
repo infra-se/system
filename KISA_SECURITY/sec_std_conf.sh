@@ -16,7 +16,6 @@ BACKUP_SERVICE_DIR=/root/shell/CONF_BACKUP/service
 BACKUP_PERMISSION_DIR=/root/shell/CONF_BACKUP/permission
 mkdir -p ${LOG_DIR} ${COMMON_VARS_DIR} ${BACKUP_ROOT_DIR} ${BACKUP_SERVICE_DIR} ${BACKUP_PERMISSION_DIR}
 
-
 #############################
 ###### COMMON FUNCTION ######
 #############################
@@ -219,6 +218,17 @@ FUNCT_RESTORE_PERM() {
 	fi
 }
 
+FUNCT_CHECK_SYMBOLIC() {
+	TARGET_LIST=$1
+        CHECK_SYMBOLIC_LINK=`stat -c %F ${TARGET_LIST} | grep "symbolic" | wc -l`
+        if [ ${CHECK_SYMBOLIC_LINK} -eq 0 ]
+        then
+		export CHECK_SYMBOLIC_STAT=0
+	else
+		export CHECK_SYMBOLIC_STAT=1
+	fi
+}
+
 FUNCT_BACKUP_FILE() {
 	TARGET_LIST=$1
 	BASE_FILE=`basename ${TARGET_LIST}`
@@ -227,8 +237,8 @@ FUNCT_BACKUP_FILE() {
 	BACKUP_FILE=${BACKUP_BASE_DIR}/${BASE_FILE}.${DATE_TIME}
 	mkdir -p ${BACKUP_BASE_DIR}
 
-	CHECK_SYMBOLIC_LINK=`stat -c %F ${TARGET_LIST} | grep "symbolic" | wc -l`
-	if [ ${CHECK_SYMBOLIC_LINK} -eq 0 ]
+	FUNCT_CHECK_SYMBOLIC ${TARGET_LIST}
+	if [ ${CHECK_SYMBOLIC_STAT} -eq 0 ]
 	then
 		cp -fpP ${TARGET_LIST} ${BACKUP_FILE}
 		echo "[INFO] ${HOSTNAME} Backup Complete : ${BACKUP_FILE}"
@@ -243,26 +253,41 @@ FUNCT_BACKUP_FILE() {
 
 FUNCT_CHECK_BACKCUP_FILE() {
 	TARGET_LIST=$1
-	
-	ls -1 ${BACKUP_ROOT_DIR}${TARGET_LIST}* 2>&- > /dev/null
 
-	if [ $? -eq 0 ]
+	FUNCT_CHECK_SYMBOLIC ${TARGET_LIST}
+	if [ ${CHECK_SYMBOLIC_STAT} -eq 0 ]
 	then
-		export CHECK_RESULT_BACKUP=0
-		export LAST_BACKUP_FILE=`ls -1 ${BACKUP_ROOT_DIR}${TARGET_LIST}* | tail -1`
+		ls -1 ${BACKUP_ROOT_DIR}${TARGET_LIST}* 2>&- > /dev/null
+
+		if [ $? -eq 0 ]
+		then
+			export CHECK_RESULT_BACKUP=0
+			export LAST_BACKUP_FILE=`ls -1 ${BACKUP_ROOT_DIR}${TARGET_LIST}* | tail -1`
+		else
+			export CHECK_RESULT_BACKUP=1
+		fi
 	else
-		export CHECK_RESULT_BACKUP=1
+		ORIGIN_FILE=`readlink -f ${TARGET_LIST}`
+		ORIGIN_BASE_FILE=`basename ${ORIGIN_FILE}`
+		ls -1 ${BACKUP_ROOT_DIR}${ORIGIN_FILE}* 2>&- > /dev/null
+
+		if [ $? -eq 0 ]
+		then
+			export CHECK_RESULT_BACKUP=0
+			export LAST_BACKUP_FILE=`ls -1 ${BACKUP_ROOT_DIR}${ORIGIN_FILE}* | tail -1`
+		else
+			export CHECK_RESULT_BACKUP=1
+		fi
 	fi
 }
 
 FUNCT_RESTORE_FILE() {
 	TARGET_LIST=$1
 	FUNCT_CHECK_BACKCUP_FILE ${TARGET_LIST}
+	CHECK_BACKUP_FILE_NONE_CONFIG=`grep "^NONE$" ${LAST_BACKUP_FILE} | wc -l`
 
-	if [ ${CHECK_RESULT_BACKUP} -eq 0 ]
+	if [ ${CHECK_RESULT_BACKUP} -eq 0 -a ${CHECK_SYMBOLIC_STAT} -eq 0 ]
 	then
-		CHECK_BACKUP_FILE_NONE_CONFIG=`grep "^NONE$" ${LAST_BACKUP_FILE} | wc -l`
-
 		if [ ${CHECK_BACKUP_FILE_NONE_CONFIG} -eq 0 ]
 		then
 			echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${TARGET_LIST}"
@@ -271,6 +296,18 @@ FUNCT_RESTORE_FILE() {
 			echo "[INFO] ${HOSTNAME} AS-IS Config is None : ${LAST_BACKUP_FILE}"
 			echo "[INFO] ${HOSTNAME} Restore Type is Config Delete : ${TARGET_LIST}"
 			rm -f ${TARGET_LIST}
+		fi
+
+	elif [ ${CHECK_RESULT_BACKUP} -eq 0 -a ${CHECK_SYMBOLIC_STAT} -eq 1 ]
+	then
+		if [ ${CHECK_BACKUP_FILE_NONE_CONFIG} -eq 0 ]
+		then
+			echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${ORIGIN_FILE}"
+			cp -fpP ${LAST_BACKUP_FILE} ${ORIGIN_FILE}
+		else
+			echo "[INFO] ${HOSTNAME} AS-IS Config is None : ${LAST_BACKUP_FILE}"
+			echo "[INFO] ${HOSTNAME} Restore Type is Config Delete : ${ORIGIN_FILE}"
+			rm -f ${ORIGIN_FILE}
 		fi
 	else
 		echo "[INFO] ${HOSTNAME} Can not Restore & Backup File Not found : ${TARGET_LIST}" 
@@ -711,8 +748,6 @@ FUNCT_U06() {
 			for LIST in `cat ${TARGET_LIST}`
 			do
 				FUNCT_CHECK_FILE ${LIST}
-				#FUNCT_BACKUP_FILE ${LIST}
-				
 				################ Independent Processing Logic [ BEGIN ] ################
 	
 				echo "[WARN] ${HOSTNAME} File is without owner and do not exist account : ${LIST}"
@@ -1626,4 +1661,3 @@ else
 fi
 
 ##############################################################################
-
