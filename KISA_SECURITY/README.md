@@ -65,27 +65,37 @@ Resolving deltas: 100% (333/333), done.
 취약점 조치 작업에 의한 시스템 이상 발생시 작업전 형상 복구를 위해 Script 실행시 기본적으로 관련 File 및 권한정보를 백업하도록 Logic화 되어있습니다.
 
 ```
-[root@centos01 MANUAL_SCRIPT]#
-[root@centos01 MANUAL_SCRIPT]# ./sec_std_conf.sh
-[ERROR] WORK TYPE was not Input.
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# ./sec_std_conf.sh 
+
+[ERROR] centos01 WORK TYPE was not Input.
 
 ### 1. Input Work Type : Only PROC or RESTORE ###
 
 Usage ) : ./sec_std_conf.sh PROC
 
-[root@centos01 MANUAL_SCRIPT]#
-[root@centos01 MANUAL_SCRIPT]#
-[root@centos01 MANUAL_SCRIPT]# ./sec_std_conf.sh PROC
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# ./sec_std_conf.sh PROC
+
+[RECOMMEND] Be sure to read the guide document before running.
+https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md
+
+[QUESTION] Do you want run Script ? : y or n
+
+y
+
 ### PROCESS U01 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/ssh/sshd_config.20250305_150040
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/ssh/sshd_config.20250310_092633
 [INFO] centos01 Processing PermitRootLogin no : /etc/ssh/sshd_config
 
 ### PROCESS U02 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/security/pwquality.conf.20250305_150040
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/security/pwquality.conf.20250310_092633
 [INFO] centos01 Processing Password Quality : /etc/security/pwquality.conf
 
 ### PROCESS U03 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/pam.d/system-auth.20250305_150040
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/pam.d/system-auth.20250310_092633
 [INFO] centos01 Processing Password Lock : /etc/pam.d/system-auth
 
 ### PROCESS U04 ###
@@ -113,8 +123,17 @@ drwxr-xr-x 2 root root  6 Mar  5 15:00 service
 4. 필요시 아래와 같이 필요시 RESTORE 옵션을 통해 SCRIPT 수행전으로 자동 원복 가능 합니다.  
 (현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현됨.)
 ```
-[root@centos01 MANUAL_SCRIPT]#
-[root@centos01 MANUAL_SCRIPT]# ./sec_std_conf.sh RESTORE
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# 
+[root@centos01 KISA_SECURITY]# ./sec_std_conf.sh RESTORE
+
+[RECOMMEND] Be sure to read the guide document before running.
+https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md
+
+[QUESTION] Do you want run Script ? : y or n
+
+y
+
 ### PROCESS U01 ###
 [INFO] centos01 Restore File : /root/shell/CONF_BACKUP/etc/ssh/sshd_config.20250305_150040 -> /etc/ssh/sshd_config
 
