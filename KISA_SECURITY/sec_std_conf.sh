@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250327
+SCRIPT_VERSION=0.9.20250328
 
 export LANG=C
 export LC_ALL=C
@@ -267,30 +267,42 @@ FUNCT_RESTORE_FILE() {
 	fi
 }
 
+
+FUNCT_CHECK_SERVICE() {
+	TARGET_SERVICE=$1
+	CHECK_SERVICE_STAT=`systemctl is-enabled ${TARGET_SERVICE} 2>&1`
+
+	if [ ${CHECK_SERVICE_STAT} = "enabled" ]
+	then
+		export CHECK_SERVICE_RESULT=0
+
+	elif [ ${CHECK_SERVICE_STAT} = "disabled" ]
+	then
+		export CHECK_SERVICE_RESULT=1
+	else
+		export CHECK_SERVICE_RESULT=2
+	fi
+}
+
+
 FUNCT_BACKUP_SERVICE() {
 	TARGET_SERVICE=$1
-	systemctl is-enabled ${TARGET_SERVICE} 2>&- > /dev/null
 
-	if [ $? -eq 0 ]
+	if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
 	then
-		CHECK_SERVICE_STAT=`systemctl is-enabled ${TARGET_SERVICE} | grep enable | wc -l`
-	
-		if [ ${CHECK_SERVICE_STAT} -eq 1 ]
-		then
-			echo "enable" > ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}
-		else
-			echo "disable" > ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}
-		fi
+		echo "enable" > ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}
+	elif [ ${CHECK_SERVICE_RESULT} -eq 1 ]
+	then
+		echo "disable" > ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}
 	else
-		echo "[INFO] ${HOSTNAME} Package Not Installed : ${TARGET_SERVICE}"
+		echo "[INFO] ${HOSTNAME} Package is Not Installed : ${TARGET_SERVICE}"
 	fi
 }
 
 FUNCT_SERVICE_PROCESS() {
 	TARGET_SERVICE=$1
-	systemctl is-enabled ${TARGET_SERVICE} 2>&- > /dev/null
 
-	if [ $? -eq 0 ]
+	if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
 	then
 		FUNCT_BACKUP_SERVICE ${TARGET_SERVICE} 
 		BACKUP_SERVICE_STAT=`cat ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}`
@@ -298,8 +310,14 @@ FUNCT_SERVICE_PROCESS() {
 		echo "[INFO] ${HOSTNAME} Service Disable & Stop : ${TARGET_SERVICE}" 
 		systemctl disable ${TARGET_SERVICE}
 		systemctl stop ${TARGET_SERVICE}
-	else
-		echo "[INFO] ${HOSTNAME} Package Not Installed : ${TARGET_SERVICE}"
+	elif [ ${CHECK_SERVICE_RESULT} -eq 1 ]
+	then
+		FUNCT_BACKUP_SERVICE ${TARGET_SERVICE} 
+		BACKUP_SERVICE_STAT=`cat ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE}`
+		echo "[INFO] ${HOSTNAME} Service BACKUP : ${BACKUP_SERVICE_DIR}/${TARGET_SERVICE} [ ${BACKUP_SERVICE_STAT} ]" 
+		echo "[INFO] ${HOSTNAME} Service Enable & Start : ${TARGET_SERVICE}" 
+		systemctl enable ${TARGET_SERVICE}
+		systemctl start ${TARGET_SERVICE}
 	fi
 }
 
@@ -371,22 +389,18 @@ FUNCT_U01() {
 			CHECK_VALUE=`grep "PermitRootLogin" ${TARGET_LIST} | wc -l`
 			if [ ${CHECK_VALUE} -eq 0 ]
 			then
-				echo >> ${TARGET_LIST}
 				echo "### Add Config PermitRootLogin ${DATE_TIME} : $0" >> ${TARGET_LIST}
 				echo "PermitRootLogin no" >> ${TARGET_LIST}
 				echo "### End Conifg PermitRootLogin ${DATE_TIME} : $0" >> ${TARGET_LIST}
-				echo >> ${TARGET_LIST}
 			else
 				sed -i '/Add Config PermitRootLogin/d' ${TARGET_LIST}	
 				sed -i '/PermitRootLogin/d' ${TARGET_LIST}	
 				sed -i '/Match Address/d' ${TARGET_LIST}	
 				sed -i '/End Conifg PermitRootLogin/d' ${TARGET_LIST}	
 
-				echo >> ${TARGET_LIST}
 				echo "### Add Config PermitRootLogin ${DATE_TIME} : $0" >> ${TARGET_LIST}
 				echo "PermitRootLogin no" >> ${TARGET_LIST}
 				echo "### End Conifg PermitRootLogin ${DATE_TIME} : $0" >> ${TARGET_LIST}
-				echo >> ${TARGET_LIST}
 			fi
 
 			################ Independent Processing Logic [ END ]################
@@ -1280,7 +1294,7 @@ FUNCT_U18() {
 
 	if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
 	then
-		EXT_MSG="Physical firewall applied."
+		EXT_MSG="You need to check Physical Firewall."
 		FUNCT_EXCEPTION "${EXT_MSG}"
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -1297,10 +1311,13 @@ FUNCT_U19() {
 
 	WORK_TYPE=$1
 	TARGET_LIST=/etc/inetd.conf
+	TARGET_SEVICE=finger.socket
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
 		FUNCT_CHECK_FILE ${TARGET_LIST}
+		FUNCT_CHECK_SERVICE ${TARGET_SEVICE}
+
 		if [ ${CHECK_RESULT} -eq 0 ]
 		then
 			
@@ -1318,16 +1335,33 @@ FUNCT_U19() {
 			fi
 
 			################ Independent Processing Logic [ END ]################
-		else
+		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_RESULT} -eq 0 ]
+		then
+			FUNCT_SERVICE_PROCESS ${TARGET_SEVICE}
+
+		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_RESULT} -eq 1 ]
+		then
+			echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+
+		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_RESULT} -eq 2 ]
+		then
 			echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
 		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
 		FUNCT_CHECK_FILE ${TARGET_LIST}
+		FUNCT_CHECK_SERVICE_BACKUP ${TARGET_SEVICE}
+
 		if [ ${CHECK_RESULT} -eq 0 ]
 		then
 			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_BACKUP} -eq 0 ]
+		then
+			FUNCT_RESTORE_SERVICE ${TARGET_SEVICE} 
+		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_BACKUP} -eq 1 ]
+		then
+			echo "[INFO] ${HOSTNAME} File & Service Backup Not found."
 		fi
 
 	else
