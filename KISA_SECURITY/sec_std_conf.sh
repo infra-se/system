@@ -214,7 +214,7 @@ FUNCT_RESTORE_PERM() {
 			echo "[INFO] ${HOSTNAME} Not Support RESTORE TYPE"
 		fi
 	else
-		echo "[INFO] ${HOSTNAME} Can not Restore & Permission Backup File Not found : ${TARGET_LIST}" 
+		echo "[INFO] ${HOSTNAME} Permission Backup file not found and No Restore : ${TARGET_LIST}" 
 	fi
 }
 
@@ -310,7 +310,7 @@ FUNCT_RESTORE_FILE() {
 			rm -f ${ORIGIN_FILE}
 		fi
 	else
-		echo "[INFO] ${HOSTNAME} Can not Restore & Backup File Not found : ${TARGET_LIST}" 
+		echo "[INFO] ${HOSTNAME} Backup file not found and No Restore : ${TARGET_LIST}" 
 	fi
 }
 
@@ -1500,7 +1500,7 @@ FUNCT_U20() {
 					################ Independent Processing Logic [ END ]################
 				fi
 			else
-				echo "[INFO] ${HOSTNAME} This System is U-20 Check OK"	
+				echo "[INFO] ${HOSTNAME} This System is U-20 Check OK : ${LIST}"	
 			fi
 		done
 
@@ -1528,6 +1528,24 @@ FUNCT_U20() {
 				then
 					FUNCT_RESTORE_FILE ${TARGET_LIST}
 					echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+				fi
+			elif [ ${CHECK_SERVICE_RESULT} -eq 1 -a ${LIST} = "vsftpd.service" ]
+			then
+				TARGET_LIST=/etc/vsftpd/vsftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_RESTORE_FILE ${TARGET_LIST}
+				fi
+			elif [ ${CHECK_SERVICE_RESULT} -eq 1 -a ${LIST} = "proftpd.service" ]
+			then
+				TARGET_LIST=/etc/proftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_RESTORE_FILE ${TARGET_LIST}
 				fi
 			fi
 		done
