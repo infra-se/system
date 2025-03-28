@@ -225,10 +225,20 @@ FUNCT_BACKUP_FILE() {
 	BASE_DIR=`dirname ${TARGET_LIST}`
 	BACKUP_BASE_DIR=${BACKUP_ROOT_DIR}${BASE_DIR}
 	BACKUP_FILE=${BACKUP_BASE_DIR}/${BASE_FILE}.${DATE_TIME}
-
 	mkdir -p ${BACKUP_BASE_DIR}
-	cp -fpP ${TARGET_LIST} ${BACKUP_FILE}
-	echo "[INFO] ${HOSTNAME} Backup Complete : ${BACKUP_FILE}"
+
+	CHECK_SYMBOLIC_LINK=`stat -c %F ${TARGET_LIST} | grep "symbolic" | wc -l`
+	if [ ${CHECK_SYMBOLIC_LINK} -eq 0 ]
+	then
+		cp -fpP ${TARGET_LIST} ${BACKUP_FILE}
+		echo "[INFO] ${HOSTNAME} Backup Complete : ${BACKUP_FILE}"
+	else
+		ORIGIN_FILE=`readlink -f ${TARGET_LIST}`
+		ORIGIN_BASE_FILE=`basename ${ORIGIN_FILE}`
+		cp -fpP ${ORIGIN_FILE} ${BACKUP_BASE_DIR}/${ORIGIN_BASE_FILE}.${DATE_TIME}
+		echo "[INFO] ${HOSTNAME} Backup Complete : ${BACKUP_BASE_DIR}/${ORIGIN_BASE_FILE}.${DATE_TIME}"
+	fi
+
 }
 
 FUNCT_CHECK_BACKCUP_FILE() {
@@ -524,7 +534,7 @@ FUNCT_U02() {
 			FUNCT_CHECK_FILE ${TARGET_LIST}
 			if [ ${CHECK_RESULT} -eq 0 ]
 			then
-				FUNCT_RESTORE_FILE ${TARGET_LIST}j6j6
+				FUNCT_RESTORE_FILE ${TARGET_LIST}
 			fi
 
 		else
@@ -1371,6 +1381,127 @@ FUNCT_U19() {
 }
 
 
+FUNCT_U20() {
+	echo
+	#########################
+	echo "### PROCESS U20 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	vsftpd.service
+	proftpd.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE ${LIST}	
+			if [ ${CHECK_SERVICE_RESULT} -eq 0 -a ${LIST} == "vsftpd.service" ]
+			then
+				TARGET_LIST=/etc/vsftpd/vsftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
+					################ Independent Processing Logic [ BEGIN ] ################
+
+					echo "[INFO] ${HOSTNAME} Processing (anonymous_enable=NO) : ${TARGET_LIST}"
+					CHECK_VALUE=`grep "anonymous_enable" ${TARGET_LIST} | wc -l`
+
+					if [ ${CHECK_VALUE} -eq 0 ]
+					then
+						echo "### Add Config Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "anonymous_enable=NO" >> ${TARGET_LIST}
+						echo "### End Conifg Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+					else
+						sed -i '/Add Config Anonymous/d' ${TARGET_LIST}	
+						sed -i '/^anonymous_enable/d' ${TARGET_LIST}	
+						sed -i '/End Conifg Anonymous/d' ${TARGET_LIST}	
+
+						echo "### Add Config Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "anonymous_enable=NO" >> ${TARGET_LIST}
+						echo "### End Conifg Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+					fi
+
+					################ Independent Processing Logic [ END ]################
+				fi
+
+			elif [ ${CHECK_SERVICE_RESULT} -eq 0 -a ${LIST} == "proftpd.service" ]
+			then
+				TARGET_LIST=/etc/proftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
+					################ Independent Processing Logic [ BEGIN ] ################
+
+					echo "[INFO] ${HOSTNAME} Processing (AllowAnonymous off) : ${TARGET_LIST}"
+					CHECK_VALUE=`grep "AllowAnonymous" ${TARGET_LIST} | wc -l`
+
+					if [ ${CHECK_VALUE} -eq 0 ]
+					then
+						echo "### Add Config Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "AllowAnonymous off" >> ${TARGET_LIST}
+						echo "### End Conifg Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+					else
+						sed -i '/Add Config Anonymous/d' ${TARGET_LIST}	
+						sed -i '/^AllowAnonymous/d' ${TARGET_LIST}	
+						sed -i '/End Conifg Anonymous/d' ${TARGET_LIST}	
+
+						echo "### Add Config Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "AllowAnonymous off" >> ${TARGET_LIST}
+						echo "### End Conifg Anonymous Disable ${DATE_TIME} : $0" >> ${TARGET_LIST}
+						echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+					fi
+
+					################ Independent Processing Logic [ END ]################
+				fi
+			else
+				echo "[INFO] ${HOSTNAME} This System is U-20 Check OK"	
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE ${LIST}
+			if [ ${CHECK_SERVICE_RESULT} -eq 0 -a ${LIST} = "vsftpd.service" ]
+			then
+				TARGET_LIST=/etc/vsftpd/vsftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_RESTORE_FILE ${TARGET_LIST}
+					echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+				fi
+			elif [ ${CHECK_SERVICE_RESULT} -eq 0 -a ${LIST} = "proftpd.service" ]
+			then
+				TARGET_LIST=/etc/proftpd.conf
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_RESTORE_FILE ${TARGET_LIST}
+					echo "[INFO] ${HOSTNAME} You are need to run command : systemctl restart ${LIST}"
+				fi
+			fi
+		done
+
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 
 FUNCT_U22() {
@@ -1467,6 +1598,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U17 ${WORK_TYPE}
 	FUNCT_U18 ${WORK_TYPE} ### Exception : Not need FUNCT_U18 ###
 	FUNCT_U19 ${WORK_TYPE}
+	FUNCT_U20 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
 }
 
@@ -1494,3 +1626,4 @@ else
 fi
 
 ##############################################################################
+
