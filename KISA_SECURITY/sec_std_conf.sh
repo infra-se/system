@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250328
+SCRIPT_VERSION=0.9.20250331
 
 export LANG=C
 export LC_ALL=C
@@ -409,6 +409,18 @@ FUNCT_EXCEPTION() {
 	echo "[INFO] ${HOSTNAME} Exception: ${EXT_MSG} : OK"
 }
 
+FUNCT_CHECK_PORT() {
+	TARGET_PORT=$1
+	CHECK_PORT=`netstat -lnp | grep "^tcp" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | wc -l`
+
+	if [ ${CHECK_PORT} -eq 0 ]
+	then
+		export CHECK_PORT_RESULT=0
+	else
+		export CHECK_PORT_RESULT=1
+	fi
+}
+
 
 ###################################
 ###### MAIN PROCESS FUNCTION ######
@@ -755,7 +767,7 @@ FUNCT_U06() {
 				################ Independent Processing Logic [ END ] ################
 			done
 		else
-			echo "[INFO] ${HOSTNAME} This System is U-06 Check OK"
+			echo "[INFO] ${HOSTNAME} This System is U-06 Check : OK"
 		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -1129,7 +1141,7 @@ FUNCT_U15() {
 				################ Independent Processing Logic [ END ] ################
 			done
 		else
-			echo "[INFO] ${HOSTNAME} This System is U-15 Check OK"
+			echo "[INFO] ${HOSTNAME} This System is U-15 Check : OK"
 		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -1198,7 +1210,7 @@ FUNCT_U16() {
 				fi
 			done
 		else
-			echo "[INFO] ${HOSTNAME} This System is U-16 Check OK"
+			echo "[INFO] ${HOSTNAME} This System is U-16 Check : OK"
 		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -1232,7 +1244,6 @@ FUNCT_U17() {
 	#########################
 
 	WORK_TYPE=$1
-
 
 	############ U17 INDEPENDENT FUNCTION & LOGIC BEGIN ############
 
@@ -1292,7 +1303,7 @@ FUNCT_U17() {
 			FUNCT_CHECK_COMPARE ${OS_VERSION} 22.04
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
 			then
-				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"	
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check : OK"	
 			else
 				INNER_FUNCT_BACKUP ${ARRAY_TAGET_LIST}
 			fi
@@ -1302,7 +1313,7 @@ FUNCT_U17() {
 			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
 			then
-				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check : OK"
 			else
 				INNER_FUNCT_BACKUP ${ARRAY_TAGET_LIST}
 			fi
@@ -1319,7 +1330,7 @@ FUNCT_U17() {
 				FUNCT_CHECK_PERM_BACKUP ${LIST}
 				FUNCT_RESTORE_PERM ${LIST} ALL
 			else
-				echo "[INFO] ${HOSTNAME} This System is U-17 Check OK"
+				echo "[INFO] ${HOSTNAME} This System is U-17 Check : OK"
 			fi
 		done
 	else
@@ -1376,7 +1387,7 @@ FUNCT_U19() {
 				echo "[INFO] ${HOSTNAME} Disable finger service : ${TARGET_LIST}"
 				sed -i "s/^finger/#finger/g" ${TARGET_LIST}
 			else
-				echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+				echo "[INFO] ${HOSTNAME} This System is U-19 Check : OK"
 			fi
 
 			################ Independent Processing Logic [ END ]################
@@ -1386,11 +1397,11 @@ FUNCT_U19() {
 
 		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_RESULT} -eq 1 ]
 		then
-			echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+			echo "[INFO] ${HOSTNAME} This System is U-19 Check : OK"
 
 		elif [ ${CHECK_RESULT} -eq 1 -a ${CHECK_SERVICE_RESULT} -eq 2 ]
 		then
-			echo "[INFO] ${HOSTNAME} This System is U-19 Check OK"
+			echo "[INFO] ${HOSTNAME} This System is U-19 Check : OK"
 		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -1556,6 +1567,77 @@ FUNCT_U20() {
 	fi
 }
 
+FUNCT_U21() {
+	echo
+	#########################
+	echo "### PROCESS U21 ###"
+	#########################
+
+	WORK_TYPE=$1
+	TARGET_SERVICE_PORT="512 513 514"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			CHECK_ALL_PORT=0
+			declare -a ARRAY_CHECK_PORT			
+			for LIST in ${TARGET_SERVICE_PORT}
+			do
+				FUNCT_CHECK_PORT ${LIST}
+				if [ ${CHECK_PORT_RESULT} -ne 0 ]
+				then
+					export CHECK_ALL_PORT=1
+					ARRAY_CHECK_PORT+=("${LIST}")
+				fi
+			done
+
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} This System is U-21 Check : OK"	
+			elif [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ] 
+			then
+				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (TCP ${ARRAY_CHECK_PORT[@]}) : Not OK"	
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			CHECK_ALL_PORT=0
+			declare -a ARRAY_CHECK_PORT			
+			for LIST in ${TARGET_SERVICE_PORT}
+			do
+				FUNCT_CHECK_PORT ${LIST}
+				if [ ${CHECK_PORT_RESULT} -ne 0 ]
+				then
+					export CHECK_ALL_PORT=1
+					ARRAY_CHECK_PORT+=("${LIST}")
+				fi
+			done
+
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} This System is U-21 Check : OK"	
+			elif [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ] 
+			then
+				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (TCP ${ARRAY_CHECK_PORT[@]}) : Not OK"	
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
+			fi
+		fi
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U21."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_U22() {
 	echo
@@ -1652,6 +1734,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U18 ${WORK_TYPE} ### Exception : Not need FUNCT_U18 ###
 	FUNCT_U19 ${WORK_TYPE}
 	FUNCT_U20 ${WORK_TYPE}
+	FUNCT_U21 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
 }
 
