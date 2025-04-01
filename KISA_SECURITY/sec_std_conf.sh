@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250331
+SCRIPT_VERSION=0.9.20250401
 
 export LANG=C
 export LC_ALL=C
@@ -410,8 +410,10 @@ FUNCT_EXCEPTION() {
 }
 
 FUNCT_CHECK_PORT() {
-	TARGET_PORT=$1
-	CHECK_PORT=`netstat -lnp | grep "^tcp" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | wc -l`
+	TARGET_PROTO=$1
+	TARGET_PORT=$2
+
+	CHECK_PORT=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | wc -l`
 
 	if [ ${CHECK_PORT} -eq 0 ]
 	then
@@ -419,6 +421,26 @@ FUNCT_CHECK_PORT() {
 	else
 		export CHECK_PORT_RESULT=1
 	fi
+}
+
+
+FUNCT_CHECK_PORT_LOOP() {
+	TARGET_SERVICE_PORT=$1
+	CHECK_ALL_PORT=0
+	declare -g -a ARRAY_CHECK_PORT			
+
+	for LIST in ${TARGET_SERVICE_PORT}
+	do
+		OBJ_PROTO=`echo ${LIST} | cut -d "/" -f1`
+		OBJ_PORT=`echo ${LIST} | cut -d "/" -f2`
+
+		FUNCT_CHECK_PORT ${OBJ_PROTO} ${OBJ_PORT}
+		if [ ${CHECK_PORT_RESULT} -ne 0 ]
+		then
+			export CHECK_ALL_PORT=1
+			ARRAY_CHECK_PORT+=("${LIST}")
+		fi
+	done
 }
 
 
@@ -1574,56 +1596,36 @@ FUNCT_U21() {
 	#########################
 
 	WORK_TYPE=$1
-	TARGET_SERVICE_PORT="512 513 514"
+	TARGET_SERVICE_PORT="tcp/512 tcp/513 tcp/514"
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
 		if [ ${OS_PLATFORM} = "UBUNTU" ]
 		then
-			CHECK_ALL_PORT=0
-			declare -a ARRAY_CHECK_PORT			
-			for LIST in ${TARGET_SERVICE_PORT}
-			do
-				FUNCT_CHECK_PORT ${LIST}
-				if [ ${CHECK_PORT_RESULT} -ne 0 ]
-				then
-					export CHECK_ALL_PORT=1
-					ARRAY_CHECK_PORT+=("${LIST}")
-				fi
-			done
-
+			FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
 			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
 			then
 				echo "[INFO] ${HOSTNAME} This System is U-21 Check : OK"	
 			elif [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ] 
 			then
-				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (TCP ${ARRAY_CHECK_PORT[@]}) : Not OK"	
+				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (${ARRAY_CHECK_PORT[@]}) : r-command enable and Not OK"
 			else
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
 			fi
 
 		elif [ ${OS_PLATFORM} = "RHEL" ]
 		then
-			CHECK_ALL_PORT=0
-			declare -a ARRAY_CHECK_PORT			
-			for LIST in ${TARGET_SERVICE_PORT}
-			do
-				FUNCT_CHECK_PORT ${LIST}
-				if [ ${CHECK_PORT_RESULT} -ne 0 ]
-				then
-					export CHECK_ALL_PORT=1
-					ARRAY_CHECK_PORT+=("${LIST}")
-				fi
-			done
-
+			FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
 			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+
 			if [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
 			then
 				echo "[INFO] ${HOSTNAME} This System is U-21 Check : OK"	
 			elif [ ${CHECK_COMPARE_RESULT} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ] 
 			then
-				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (TCP ${ARRAY_CHECK_PORT[@]}) : Not OK"	
+				echo "[WARN] ${HOSTNAME} You need to Check Listen Port (${ARRAY_CHECK_PORT[@]}) : r-command enable and Not OK"
 			else
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
 			fi
