@@ -1533,7 +1533,7 @@ FUNCT_U20() {
 					################ Independent Processing Logic [ END ]################
 				fi
 			else
-				echo "[INFO] ${HOSTNAME} This System is U-20 Check OK : ${LIST}"	
+				echo "[INFO] ${HOSTNAME} This System is U-20 Check : OK (${LIST})"	
 			fi
 		done
 
@@ -1751,7 +1751,7 @@ FUNCT_U23() {
 FUNCT_U24() {
 	echo
 	#########################
-	echo "### PROCESS U24 ###"
+	echo "### PROCESS U24, U25 ###"
 	#########################
 
 	WORK_TYPE=$1
@@ -1787,7 +1787,7 @@ FUNCT_U24() {
 						fi
 						################ Independent Processing Logic [ END ]################
 					else
-						echo "[INFO] ${HOSTNAME} This System is U-24 Check OK : ${LIST}"	
+						echo "[INFO] ${HOSTNAME} This System is U-24 Check : OK (${LIST})"	
 					fi
 				done
 			else
@@ -1819,7 +1819,7 @@ FUNCT_U24() {
 						fi
 						################ Independent Processing Logic [ END ]################
 					else
-						echo "[INFO] ${HOSTNAME} This System is U-24 Check OK : ${LIST}"	
+						echo "[INFO] ${HOSTNAME} This System is U-24 Check : OK (${LIST})"	
 					fi
 				done
 			else
@@ -1846,6 +1846,201 @@ FUNCT_U24() {
 		exit 1
 	fi
 }
+
+
+FUNCT_U26() {
+	echo
+	#########################
+	echo "### PROCESS U26 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	autofs.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						FUNCT_SERVICE_DISABLE_PROCESS ${LIST}
+						echo "[WARN] ${HOSTNAME} Found ${LIST} that is not in use."
+						systemctl disable ${LIST}
+						systemctl stop ${LIST}
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-26 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}	
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						FUNCT_SERVICE_DISABLE_PROCESS ${LIST}
+						echo "[WARN] ${HOSTNAME} Found ${LIST} that is not in use."
+						systemctl disable ${LIST}
+						systemctl stop ${LIST}
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-26 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE_BACKUP ${LIST}	
+			if [ ${CHECK_SERVICE_BACKUP} -eq 0 ]
+			then
+				FUNCT_RESTORE_SERVICE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
+FUNCT_U27() {
+	echo
+	#########################
+	echo "### PROCESS U27 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	rpcbind.service
+	rpcidmapd.service
+	rpc-statd.service
+	rpc-statd-notify.service
+	rpc-gssd.service
+	rpc-rquotad.service
+	rpcgssd.service
+	"
+
+	################################################################################################################################################
+	### [WARN] Required list in NFS Client environment. (rpcbind.service(NFS Client common), rpc-statd.service(NFSv3), rpcidmapd.service(NFSv4)) ###	
+	################################################################################################################################################
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						if [ ${LIST} == "rpcbind.service" -o ${LIST} == "rpc-statd.service" -o ${LIST} == "rpcidmapd.service" ]
+						then
+							echo "[WARN] ${HOSTNAME} You need to check the NFS client required service and manually disable it. (${LIST})"
+						else
+							FUNCT_SERVICE_DISABLE_PROCESS ${LIST}
+							systemctl disable ${LIST}
+							systemctl stop ${LIST}
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-27 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}	
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						if [ ${LIST} == "rpcbind.service" -o ${LIST} == "rpc-statd.service" -o ${LIST} == "rpcidmapd.service" ]
+						then
+							echo "[WARN] ${HOSTNAME} You need to check the NFS client required service and manually disable it. (${LIST})"
+						else
+							FUNCT_SERVICE_DISABLE_PROCESS ${LIST}
+							systemctl disable ${LIST}
+							systemctl stop ${LIST}
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-27 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE_BACKUP ${LIST}	
+			if [ ${CHECK_SERVICE_BACKUP} -eq 0 ]
+			then
+				FUNCT_RESTORE_SERVICE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 
 FUNCT_MAIN_PROCESS() {
@@ -1875,7 +2070,9 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U21 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
 	FUNCT_U23 ${WORK_TYPE}
-	FUNCT_U24 ${WORK_TYPE}
+	FUNCT_U24 ${WORK_TYPE} ### with U25 ###
+	FUNCT_U26 ${WORK_TYPE}
+	FUNCT_U27 ${WORK_TYPE}
 }
 
 ##############################################################################
