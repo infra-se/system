@@ -1615,6 +1615,8 @@ FUNCT_U21() {
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
 			fi
 
+			unset ARRAY_CHECK_PORT
+
 		elif [ ${OS_PLATFORM} = "RHEL" ]
 		then
 			FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
@@ -1629,6 +1631,8 @@ FUNCT_U21() {
 			else
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."	
 			fi
+
+			unset ARRAY_CHECK_PORT
 		fi
 	
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -1712,6 +1716,38 @@ FUNCT_U22() {
 }
 
 
+FUNCT_U23() {
+	echo
+	#########################
+	echo "### PROCESS U23 ###"
+	#########################
+
+	WORK_TYPE=$1
+	TARGET_SERVICE_PORT="tcp/7 udp/7 tcp/9 udp/9 tcp/13 udp/13 tcp/19 udp/19"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
+
+		if [ ${CHECK_ALL_PORT} -eq 0 ]
+		then
+			echo "[INFO] ${HOSTNAME} This System is U-23 Check : OK"	
+		else
+			echo "[WARN] ${HOSTNAME} You need to Check Listen Port (${ARRAY_CHECK_PORT[@]}) : discard, daytime, chargen service enable. Not OK"
+		fi
+
+		unset ARRAY_CHECK_PORT
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U23."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -1738,6 +1774,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U20 ${WORK_TYPE}
 	FUNCT_U21 ${WORK_TYPE}
 	FUNCT_U22 ${WORK_TYPE}
+	FUNCT_U23 ${WORK_TYPE}
 }
 
 ##############################################################################
