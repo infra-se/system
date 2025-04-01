@@ -284,31 +284,16 @@ FUNCT_CHECK_BACKCUP_FILE() {
 FUNCT_RESTORE_FILE() {
 	TARGET_LIST=$1
 	FUNCT_CHECK_BACKCUP_FILE ${TARGET_LIST}
-	CHECK_BACKUP_FILE_NONE_CONFIG=`grep "^NONE$" ${LAST_BACKUP_FILE} | wc -l`
 
 	if [ ${CHECK_RESULT_BACKUP} -eq 0 -a ${CHECK_SYMBOLIC_STAT} -eq 0 ]
 	then
-		if [ ${CHECK_BACKUP_FILE_NONE_CONFIG} -eq 0 ]
-		then
-			echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${TARGET_LIST}"
-			cp -fpP ${LAST_BACKUP_FILE} ${TARGET_LIST}
-		else
-			echo "[INFO] ${HOSTNAME} AS-IS Config is None : ${LAST_BACKUP_FILE}"
-			echo "[INFO] ${HOSTNAME} Restore Type is Config Delete : ${TARGET_LIST}"
-			rm -f ${TARGET_LIST}
-		fi
+		echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${TARGET_LIST}"
+		cp -fpP ${LAST_BACKUP_FILE} ${TARGET_LIST}
 
 	elif [ ${CHECK_RESULT_BACKUP} -eq 0 -a ${CHECK_SYMBOLIC_STAT} -eq 1 ]
 	then
-		if [ ${CHECK_BACKUP_FILE_NONE_CONFIG} -eq 0 ]
-		then
-			echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${ORIGIN_FILE}"
-			cp -fpP ${LAST_BACKUP_FILE} ${ORIGIN_FILE}
-		else
-			echo "[INFO] ${HOSTNAME} AS-IS Config is None : ${LAST_BACKUP_FILE}"
-			echo "[INFO] ${HOSTNAME} Restore Type is Config Delete : ${ORIGIN_FILE}"
-			rm -f ${ORIGIN_FILE}
-		fi
+		echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${ORIGIN_FILE}"
+		cp -fpP ${LAST_BACKUP_FILE} ${ORIGIN_FILE}
 	else
 		echo "[INFO] ${HOSTNAME} Backup file not found and No Restore : ${TARGET_LIST}" 
 	fi
@@ -319,11 +304,11 @@ FUNCT_CHECK_SERVICE() {
 	TARGET_SERVICE=$1
 	CHECK_SERVICE_STAT=`systemctl is-enabled ${TARGET_SERVICE} 2>&1`
 
-	if [ ${CHECK_SERVICE_STAT} = "enabled" ]
+	if [ "${CHECK_SERVICE_STAT}" == "enabled" ]
 	then
 		export CHECK_SERVICE_RESULT=0
 
-	elif [ ${CHECK_SERVICE_STAT} = "disabled" ]
+	elif [ "${CHECK_SERVICE_STAT}" == "disabled" ]
 	then
 		export CHECK_SERVICE_RESULT=1
 	else
@@ -777,7 +762,7 @@ FUNCT_U06() {
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
@@ -797,13 +782,13 @@ FUNCT_U06() {
 		TARGET_LIST=${BACKUP_ROOT_DIR}/NONE_USER_LIST
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
 				FUNCT_RESTORE_FILE ${LIST}
 			done
-		elif [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -eq 0 ]
+		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
 			echo "[INFO] ${HOSTNAME} Backup File Not found."
 		else
@@ -1139,7 +1124,7 @@ FUNCT_U15() {
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
@@ -1171,7 +1156,7 @@ FUNCT_U15() {
 		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
@@ -1184,7 +1169,7 @@ FUNCT_U15() {
 				fi
 			done
 
-		elif [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -eq 0 ]
+		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
 			echo "[INFO] ${HOSTNAME} Backup File Not found."
 		else
@@ -1212,7 +1197,7 @@ FUNCT_U16() {
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
@@ -1240,13 +1225,13 @@ FUNCT_U16() {
 		TARGET_LIST=${BACKUP_ROOT_DIR}/DEV_UNACCEPTABLE_LIST
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
-		if [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -gt 0 ]
+		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
 			for LIST in `cat ${TARGET_LIST}`
 			do
 				FUNCT_RESTORE_FILE ${LIST}
 			done
-		elif [ -e ${TARGET_LIST} -a ${CHECK_TARGET_OBJECT} -eq 0 ]
+		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
 			echo "[INFO] ${HOSTNAME} Backup File Not found."
 		else
@@ -2128,6 +2113,198 @@ FUNCT_U28() {
 	fi
 }
 
+FUNCT_U29() {
+	echo
+	#########################
+	echo "### PROCESS U29 ###"
+	#########################
+
+	WORK_TYPE=$1
+	TARGET_SERVICE_PORT="udp/69 udp/517 udp/518"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
+
+		if [ ${CHECK_ALL_PORT} -eq 0 ]
+		then
+			echo "[INFO] ${HOSTNAME} This System is U-29 Check : OK"	
+		else
+			echo "[WARN] ${HOSTNAME} You need to Check Listen Port (${ARRAY_CHECK_PORT[@]}) : tftp, talk, ntalk service is enable. Not OK"
+		fi
+
+		unset ARRAY_CHECK_PORT
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U29."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
+FUNCT_U30() {
+	echo
+	#########################
+	echo "### PROCESS U30 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	sendmail.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						echo "[WARN] ${HOSTNAME} Your system is using [ ${LIST} ]. You should consider disabling the service manually."
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-30 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}	
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						echo "[WARN] ${HOSTNAME} Your system is using [ ${LIST} ]. You should consider disabling the service manually."
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-30 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U30."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
+FUNCT_U31() {
+	echo
+	#########################
+	echo "### PROCESS U31 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	sendmail.service
+	"
+
+	TARGET_FILE=/etc/mail/sendmail.cf
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_FILE} | grep "Relaying denied" | wc -l`
+						if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+						then
+							echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_FILE})"
+							echo '[RECOMMEND] R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+						else
+							echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}	
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_FILE} | grep "Relaying denied" | wc -l`
+						if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+						then
+							echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_FILE})"
+							echo '[RECOMMEND] R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+						else
+							echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U31."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -2160,6 +2337,9 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U26 ${WORK_TYPE}
 	FUNCT_U27 ${WORK_TYPE}
 	FUNCT_U28 ${WORK_TYPE}
+	FUNCT_U29 ${WORK_TYPE}
+	FUNCT_U30 ${WORK_TYPE}
+	FUNCT_U31 ${WORK_TYPE}
 }
 
 ##############################################################################
