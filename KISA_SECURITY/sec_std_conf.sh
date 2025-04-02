@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250401
+SCRIPT_VERSION=0.9.20250402
 
 export LANG=C
 export LC_ALL=C
@@ -2261,7 +2261,7 @@ FUNCT_U31() {
 								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2300,7 +2300,7 @@ FUNCT_U31() {
 								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2380,7 +2380,7 @@ FUNCT_U32() {
 								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2428,7 +2428,7 @@ FUNCT_U32() {
 								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2450,6 +2450,94 @@ FUNCT_U32() {
 		then
 			FUNCT_RESTORE_FILE ${TARGET_LIST}
 		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U33() {
+	echo
+	#########################
+	echo "### PROCESS U33 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	named.service
+	pdns.service
+	pdns-recursor.service
+	unbound.service
+	dnsmasq.service
+	knot.service
+	coredns.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				CHECK_DNS=0
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						echo "[INFO] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
+						export CHECK_DNS=1
+
+						################ Independent Processing Logic [ END ]################
+					fi
+				done
+
+				if [ ${CHECK_DNS} -eq 0 ]
+				then
+					echo "[INFO] ${HOSTNAME} This System is U-33 Check : OK"
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				CHECK_DNS=0
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						echo "[INFO] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
+						export CHECK_DNS=1
+
+						################ Independent Processing Logic [ END ]################
+					fi
+				done
+
+				if [ ${CHECK_DNS} -eq 0 ]
+				then
+					echo "[INFO] ${HOSTNAME} This System is U-33 Check : OK"
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U33."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2492,6 +2580,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U30 ${WORK_TYPE}
 	FUNCT_U31 ${WORK_TYPE}
 	FUNCT_U32 ${WORK_TYPE}
+	FUNCT_U33 ${WORK_TYPE}
 }
 
 ##############################################################################
