@@ -2230,7 +2230,7 @@ FUNCT_U31() {
 	sendmail.service
 	"
 
-	TARGET_FILE=/etc/mail/sendmail.cf
+	TARGET_LIST=/etc/mail/sendmail.cf
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
@@ -2246,18 +2246,146 @@ FUNCT_U31() {
 					then
 						################ Independent Processing Logic [ BEGIN ] ################
 
-						CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_FILE} | grep "Relaying denied" | wc -l`
-						if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
 						then
-							echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_FILE})"
-							echo '[RECOMMEND] R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+							FUNCT_BACKUP_FILE ${TARGET_LIST}
+							CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_LIST} | grep "Relaying denied" | wc -l`
+							ADD_CONFIG='R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_LIST})"
+								echo "[RECOMMEND] : ${ADD_CONFIG}"
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
+							fi
 						else
-							echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
 					else
-						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}	
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+						
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							FUNCT_BACKUP_FILE ${TARGET_LIST}
+							CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_LIST} | grep "Relaying denied" | wc -l`
+							ADD_CONFIG='R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_LIST})"
+								echo "[RECOMMEND] : ${ADD_CONFIG}"
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
+							fi
+						else
+							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
+FUNCT_U32() {
+	echo
+	#########################
+	echo "### PROCESS U32 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	sendmail.service
+	"
+	TARGET_LIST=/etc/mail/sendmail.cf
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							CHECK_SECURITY_PARAM=`grep "^O PrivacyOptions" ${TARGET_LIST} | grep "restrictqrun" | wc -l`
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								FUNCT_BACKUP_FILE ${TARGET_LIST}
+								TARGET_LINE_NO=`grep -n "^O PrivacyOptions" ${TARGET_LIST} | cut -d : -f1`
+								ADD_CONFIG="O PrivacyOptions=authwarnings,novrfy,noexpn,restrictqrun"
+
+								if [ -z ${TARGET_LINE_NO} ]
+								then
+									echo "[WARN] ${HOSTNAME} You need to manually apply the restrictqrun option. (${TARGET_LIST})"
+									echo "[RECOMMEND] : ${ADD_CONFIG}"
+								else
+									echo "[WARN] ${HOSTNAME} Sendmail Restrictqrun Otion is not found. (${TARGET_LIST})"
+									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+									echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+									sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i ${ADD_CONFIG}" ${TARGET_LIST}
+								fi
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
+							fi
+						else
+							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 					fi
 				done
 			else
@@ -2276,18 +2404,36 @@ FUNCT_U31() {
 					then
 						################ Independent Processing Logic [ BEGIN ] ################
 
-						CHECK_SECURITY_PARAM=`grep "^R\$\*" ${TARGET_FILE} | grep "Relaying denied" | wc -l`
-						if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
 						then
-							echo "[WARN] ${HOSTNAME} You need to manually apply the Relay denied option. (${TARGET_FILE})"
-							echo '[RECOMMEND] R$*			$#error $@ 5.7.1 $: "550 Relaying denied"'
+							CHECK_SECURITY_PARAM=`grep "^O PrivacyOptions" ${TARGET_LIST} | grep "restrictqrun" | wc -l`
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								FUNCT_BACKUP_FILE ${TARGET_LIST}
+								TARGET_LINE_NO=`grep -n "^O PrivacyOptions" ${TARGET_LIST} | cut -d : -f1`
+								ADD_CONFIG="O PrivacyOptions=authwarnings,novrfy,noexpn,restrictqrun"
+
+								if [ -z ${TARGET_LINE_NO} ]
+								then
+									echo "[WARN] ${HOSTNAME} You need to manually apply the restrictqrun option. (${TARGET_LIST})"
+									echo "[RECOMMEND] : ${ADD_CONFIG}"
+								else
+									echo "[WARN] ${HOSTNAME} Sendmail Restrictqrun Otion is not found. (${TARGET_LIST})"
+									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+									echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+									sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i ${ADD_CONFIG}" ${TARGET_LIST}
+								fi
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
+							fi
 						else
-							echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+							echo "[INFO] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
 						fi
 
 						################ Independent Processing Logic [ END ]################
 					else
-						echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_FILE})"	
+						echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 					fi
 				done
 			else
@@ -2299,12 +2445,17 @@ FUNCT_U31() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U31."
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
 	fi
 }
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -2340,6 +2491,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U29 ${WORK_TYPE}
 	FUNCT_U30 ${WORK_TYPE}
 	FUNCT_U31 ${WORK_TYPE}
+	FUNCT_U32 ${WORK_TYPE}
 }
 
 ##############################################################################
