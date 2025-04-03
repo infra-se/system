@@ -1,5 +1,5 @@
 #!/bin/bash
-#Script made by helperchoi@gmail.com
+#Script made by helperchoi@gmail.com ( Kwang Min Choi / Aiden )
 SCRIPT_DESCRIPTION="Get KISA Vulnerability Diagnosis Automation Script"
 SCRIPT_VER=0.5.20250324
 
