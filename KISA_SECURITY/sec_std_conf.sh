@@ -214,7 +214,7 @@ FUNCT_RESTORE_PERM() {
 			echo "[INFO] ${HOSTNAME} Not Support RESTORE TYPE"
 		fi
 	else
-		echo "[INFO] ${HOSTNAME} Permission Backup file not found and No Restore : ${TARGET_LIST}" 
+		echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Permission backup) : ${TARGET_LIST}" 
 	fi
 }
 
@@ -295,7 +295,7 @@ FUNCT_RESTORE_FILE() {
 		echo "[INFO] ${HOSTNAME} Restore File : ${LAST_BACKUP_FILE} -> ${ORIGIN_FILE}"
 		cp -fpP ${LAST_BACKUP_FILE} ${ORIGIN_FILE}
 	else
-		echo "[INFO] ${HOSTNAME} Backup file not found and No Restore : ${TARGET_LIST}" 
+		echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}" 
 	fi
 }
 
@@ -391,7 +391,7 @@ FUNCT_RESTORE_SERVICE() {
 
 FUNCT_EXCEPTION() {
 	EXT_MSG="$1"
-	echo "[INFO] ${HOSTNAME} Exception: ${EXT_MSG}"
+	echo "[EXCP] ${HOSTNAME} Exception: ${EXT_MSG}"
 }
 
 FUNCT_CHECK_PORT() {
@@ -713,7 +713,7 @@ FUNCT_U04() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U04."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U04."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -743,7 +743,7 @@ FUNCT_U05() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U05."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U05."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -784,7 +784,12 @@ FUNCT_U06() {
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then	
 		TARGET_LIST=${BACKUP_ROOT_DIR}/NONE_USER_LIST
-		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		if [ -e ${TARGET_LIST} ]
+		then
+			export CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		else
+			export CHECK_TARGET_OBJECT=0
+		fi
 
 		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
@@ -794,9 +799,9 @@ FUNCT_U06() {
 			done
 		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		else
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -1105,7 +1110,7 @@ FUNCT_U14() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U14."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U14."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -1158,7 +1163,12 @@ FUNCT_U15() {
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then	
 		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
-		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		if [ -e ${TARGET_LIST} ]
+		then
+			export CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		else
+			export CHECK_TARGET_OBJECT=0
+		fi
 
 		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
@@ -1175,9 +1185,9 @@ FUNCT_U15() {
 
 		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		else
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -1227,7 +1237,12 @@ FUNCT_U16() {
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then	
 		TARGET_LIST=${BACKUP_ROOT_DIR}/DEV_UNACCEPTABLE_LIST
-		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		if [ -e ${TARGET_LIST} ]
+		then
+			export CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+		else
+			export CHECK_TARGET_OBJECT=0
+		fi
 
 		if [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
@@ -1237,9 +1252,9 @@ FUNCT_U16() {
 			done
 		elif [ -e ${TARGET_LIST} -a "${CHECK_TARGET_OBJECT}" -eq 0 ]
 		then
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		else
-			echo "[INFO] ${HOSTNAME} Backup File Not found."
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup)"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -1626,7 +1641,7 @@ FUNCT_U21() {
 	
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U21."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U21."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -1729,7 +1744,7 @@ FUNCT_U23() {
 	
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U23."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U23."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -1827,7 +1842,7 @@ FUNCT_U24() {
 			then
 				FUNCT_RESTORE_SERVICE ${LIST}
 			else
-				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
 			fi
 		done
 	else
@@ -1913,7 +1928,7 @@ FUNCT_U26() {
 			then
 				FUNCT_RESTORE_SERVICE ${LIST}
 			else
-				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
 			fi
 		done
 	else
@@ -2019,7 +2034,7 @@ FUNCT_U27() {
 			then
 				FUNCT_RESTORE_SERVICE ${LIST}
 			else
-				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
 			fi
 		done
 	else
@@ -2108,7 +2123,7 @@ FUNCT_U28() {
 			then
 				FUNCT_RESTORE_SERVICE ${LIST}
 			else
-				echo "[INFO] ${HOSTNAME} Service Backup is Not found."
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
 			fi
 		done
 	else
@@ -2141,7 +2156,7 @@ FUNCT_U29() {
 	
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U29."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U29."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2214,7 +2229,7 @@ FUNCT_U30() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U30."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U30."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2325,6 +2340,8 @@ FUNCT_U31() {
 		if [ ${CHECK_RESULT} -eq 0 ]
 		then
 			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -2453,6 +2470,8 @@ FUNCT_U32() {
 		if [ ${CHECK_RESULT} -eq 0 ]
 		then
 			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
@@ -2553,7 +2572,7 @@ FUNCT_U33() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} There is no recovery option for Function U33."
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U33."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2670,6 +2689,8 @@ FUNCT_U34() {
 		if [ ${CHECK_RESULT} -eq 0 ]
 		then
 			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
 		fi
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
