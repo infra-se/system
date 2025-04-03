@@ -1,5 +1,5 @@
 #!/bin/bash
-#Script by helperchoi@gmail.com
+#Script by helperchoi@gmail.com ( Kwang Min Choi / Aiden )
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
 SCRIPT_VERSION=0.9.20250402
 
