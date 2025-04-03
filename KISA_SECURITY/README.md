@@ -3,7 +3,7 @@
 (https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
 
 1. **25년 4월 2일자 기준 33개 취약점 항목에 대해서 자동화 조치 구현 완료**하였고, 지속적으로 Code 추가/구현 중에 있습니다. 
-2. Redhat 계열(Centos, Rocky, RHEL, OEL 등) 7.x 이상, Ubuntu 18.04 LTS 이상 Systemd 기반 환경에서만 동작토록 구현되어있으며, 이미 EOL 된지 오래된 xinetd 기반 Linux 에서는 동작하지 않거나, 정상적인 실행이 어렵습니다.
+2. Redhat 계열( Centos, Rocky, RHEL, OEL 등 ) 7.x 이상, Ubuntu 18.04 LTS 이상 Systemd 기반 환경에서만 동작토록 구현되어있으며, 이미 EOL 된지 오래된 xinetd 기반 Linux 에서는 동작하지 않거나, 정상적인 실행이 어렵습니다.
 3. 모든 처리 Logic은 각 기능별로 Function 화 구현해 두었기 때문에 재사용, 분리, 실행 예외 처리 가능합니다.
 4. 실제 Script 실행전 KISA Link 문서 확인을 통해 아래 예시와 같이 실행 환경 특성에 맞게 예외처리가 필요한 항목들을 반드시 확인 후 실행해야 합니다.  
   
