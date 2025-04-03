@@ -1,7 +1,7 @@
 #!/bin/bash
-#Script by helperchoi@gmail.com ( Kwang Min Choi / Aiden )
+#Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250402
+SCRIPT_VERSION=0.9.20250403
 
 export LANG=C
 export LC_ALL=C
@@ -399,12 +399,14 @@ FUNCT_CHECK_PORT() {
 	TARGET_PORT=$2
 
 	CHECK_PORT=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | wc -l`
+	CHECK_PROCESS_CMD=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | awk '$4 !~ /^::/ {print $NF}' | cut -d "/" -f2`
 
 	if [ ${CHECK_PORT} -eq 0 ]
 	then
 		export CHECK_PORT_RESULT=0
 	else
 		export CHECK_PORT_RESULT=1
+		export CHECK_PROCESS=${CHECK_PROCESS_CMD}
 	fi
 }
 
@@ -413,6 +415,7 @@ FUNCT_CHECK_PORT_LOOP() {
 	TARGET_SERVICE_PORT=$1
 	CHECK_ALL_PORT=0
 	declare -g -a ARRAY_CHECK_PORT			
+	declare -g -a ARRAY_CHECK_PROCESS			
 
 	for LIST in ${TARGET_SERVICE_PORT}
 	do
@@ -424,6 +427,7 @@ FUNCT_CHECK_PORT_LOOP() {
 		then
 			export CHECK_ALL_PORT=1
 			ARRAY_CHECK_PORT+=("${LIST}")
+			ARRAY_CHECK_PROCESS+=("${LIST}/${CHECK_PROCESS}")
 		fi
 	done
 }
@@ -2473,6 +2477,8 @@ FUNCT_U33() {
 	knot.service
 	coredns.service
 	"
+	
+	TARGET_SERVICE_PORT="tcp/53 udp/53"
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
@@ -2489,16 +2495,21 @@ FUNCT_U33() {
 					then
 						################ Independent Processing Logic [ BEGIN ] ################
 
-						echo "[INFO] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
+						echo "[CHECK] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
 						export CHECK_DNS=1
 
 						################ Independent Processing Logic [ END ]################
 					fi
 				done
 
-				if [ ${CHECK_DNS} -eq 0 ]
+				FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
+
+				if [ ${CHECK_DNS} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
 				then
 					echo "[INFO] ${HOSTNAME} This System is U-33 Check : OK"
+				elif [ ${CHECK_DNS} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ]
+				then
+					echo "[WARN] ${HOSTNAME} Other DNS service found. (${ARRAY_CHECK_PROCESS[@]}) Manual check for latest updates is required."
 				fi
 			else
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
@@ -2517,16 +2528,21 @@ FUNCT_U33() {
 					then
 						################ Independent Processing Logic [ BEGIN ] ################
 
-						echo "[INFO] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
+						echo "[CHECK] ${HOSTNAME} DNS service found. (${LIST}) Manual check for latest updates is required."
 						export CHECK_DNS=1
 
 						################ Independent Processing Logic [ END ]################
 					fi
 				done
 
-				if [ ${CHECK_DNS} -eq 0 ]
+				FUNCT_CHECK_PORT_LOOP "${TARGET_SERVICE_PORT}"
+
+				if [ ${CHECK_DNS} -eq 0 -a ${CHECK_ALL_PORT} -eq 0 ]
 				then
 					echo "[INFO] ${HOSTNAME} This System is U-33 Check : OK"
+				elif [ ${CHECK_DNS} -eq 0 -a ${CHECK_ALL_PORT} -eq 1 ]
+				then
+					echo "[WARN] ${HOSTNAME} Other DNS service found. (${ARRAY_CHECK_PROCESS[@]}) Manual check for latest updates is required."
 				fi
 			else
 				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
