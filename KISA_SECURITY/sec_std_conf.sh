@@ -399,7 +399,7 @@ FUNCT_CHECK_PORT() {
 	TARGET_PORT=$2
 
 	CHECK_PORT=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | wc -l`
-	CHECK_PROCESS_CMD=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | awk '$4 !~ /^::/ {print $NF}' | cut -d "/" -f2`
+	CHECK_PROCESS_CMD=`netstat -lnp | grep "^${TARGET_PROTO}" | awk '$4 ~ /:'"${TARGET_PORT}"'$/ {print $0}' | awk '$4 !~ /^::/ {print $NF}' | cut -d "/" -f2 | sort -u`
 
 	if [ ${CHECK_PORT} -eq 0 ]
 	then
