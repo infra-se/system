@@ -2561,6 +2561,123 @@ FUNCT_U33() {
 }
 
 
+FUNCT_U34() {
+	echo
+	#########################
+	echo "### PROCESS U34 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	named.service	
+	"
+	TARGET_LIST=/etc/named.conf
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							CHECK_SECURITY_PARAM=`grep "^\s*allow-transfer" ${TARGET_LIST} | wc -l`
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								FUNCT_BACKUP_FILE ${TARGET_LIST}
+								TARGET_LINE_NO=`grep -n "^\s*directory" ${TARGET_LIST} | cut -d: -f1 | awk '{print $1 + 1}'`
+								ADD_CONFIG=$(printf "\tallow-transfer\t { none; };")
+
+								echo "[WARN] ${HOSTNAME} BIND Allow-transfer Otion is not found. (${TARGET_LIST})"
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+								echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+								sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
+							fi
+						else
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check : OK"
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						################ Independent Processing Logic [ BEGIN ] ################
+
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							CHECK_SECURITY_PARAM=`grep "^\s*allow-transfer" ${TARGET_LIST} | wc -l`
+							if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+							then
+								FUNCT_BACKUP_FILE ${TARGET_LIST}
+								TARGET_LINE_NO=`grep -n "^\s*directory" ${TARGET_LIST} | cut -d: -f1 | awk '{print $1 + 1}'`
+								ADD_CONFIG=$(printf "\tallow-transfer\t { none; };")
+
+								echo "[WARN] ${HOSTNAME} BIND Allow-transfer Otion is not found. (${TARGET_LIST})"
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+								echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+								sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
+							fi
+						else
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check : OK"
+						fi
+
+						################ Independent Processing Logic [ END ]################
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
+					fi
+
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -2597,6 +2714,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U31 ${WORK_TYPE}
 	FUNCT_U32 ${WORK_TYPE}
 	FUNCT_U33 ${WORK_TYPE}
+	FUNCT_U34 ${WORK_TYPE}
 }
 
 ##############################################################################
