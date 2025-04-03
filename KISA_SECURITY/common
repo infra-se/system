@@ -1,5 +1,5 @@
 #!/bin/bash
-#Script made by helperchoi@gmail.com
+#Script made by helperchoi@gmail.com ( Kwang Min Choi / Aiden )
 SCRIPT_DESCRIPTION="COMMON VARIABLE for KISA Vulnerability Diagnosis Automation Script"
 SCRIPT_VERSION=0.2.20250324
 
