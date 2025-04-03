@@ -391,7 +391,7 @@ FUNCT_RESTORE_SERVICE() {
 
 FUNCT_EXCEPTION() {
 	EXT_MSG="$1"
-	echo "[INFO] ${HOSTNAME} Exception: ${EXT_MSG} : OK"
+	echo "[INFO] ${HOSTNAME} Exception: ${EXT_MSG}"
 }
 
 FUNCT_CHECK_PORT() {
@@ -2677,6 +2677,23 @@ FUNCT_U34() {
 	fi
 }
 
+FUNCT_U35() {
+	echo
+	#########################
+	echo "### PROCESS U35, U36, U37, U38, U39, U40, U41 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+	then
+		EXT_MSG="This item was excluded because it requires MW Specific diagnostics."
+		FUNCT_EXCEPTION "${EXT_MSG}"
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -2715,6 +2732,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U32 ${WORK_TYPE}
 	FUNCT_U33 ${WORK_TYPE}
 	FUNCT_U34 ${WORK_TYPE}
+	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41
 }
 
 ##############################################################################
