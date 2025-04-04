@@ -2440,7 +2440,7 @@ FUNCT_U32() {
 									echo "[RECOMMEND] : ${ADD_CONFIG}"
 								else
 									echo "[WARN] ${HOSTNAME} Sendmail Restrictqrun Otion is not found. (${TARGET_LIST})"
-									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 									echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
 									sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i ${ADD_CONFIG}" ${TARGET_LIST}
 								fi
@@ -2488,7 +2488,7 @@ FUNCT_U32() {
 									echo "[RECOMMEND] : ${ADD_CONFIG}"
 								else
 									echo "[WARN] ${HOSTNAME} Sendmail Restrictqrun Otion is not found. (${TARGET_LIST})"
-									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+									echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 									echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
 									sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i ${ADD_CONFIG}" ${TARGET_LIST}
 								fi
@@ -2665,7 +2665,7 @@ FUNCT_U34() {
 								ADD_CONFIG=$(printf "\tallow-transfer\t { none; };")
 
 								echo "[WARN] ${HOSTNAME} BIND Allow-transfer Otion is not found. (${TARGET_LIST})"
-								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 								echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
 								sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
 							else
@@ -2707,7 +2707,7 @@ FUNCT_U34() {
 								ADD_CONFIG=$(printf "\tallow-transfer\t { none; };")
 
 								echo "[WARN] ${HOSTNAME} BIND Allow-transfer Otion is not found. (${TARGET_LIST})"
-								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Otion : ${TARGET_LIST}"
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 								echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
 								sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
 							else
@@ -2855,6 +2855,104 @@ FUNCT_U44() {
 	fi
 }
 
+
+FUNCT_U45() {
+	echo
+	#########################
+	echo "### PROCESS U45 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/pam.d/su
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				################ Independent Processing Logic [ BEGIN ] ################
+
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					CHECK_SECURITY_PARAM=`grep "^auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | wc -l`
+					if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+					then
+						FUNCT_BACKUP_FILE ${TARGET_LIST}
+						TARGET_LINE_NO=`grep -n "^#\s*auth\s*required\s*pam_wheel.so$" ${TARGET_LIST} | cut -d : -f1 | awk '{print $1 + 1}'`
+						ADD_CONFIG=$(printf "auth\t\trequired\tpam_wheel.so use_uid group=sudo")
+
+						echo "[WARN] ${HOSTNAME} There is no wheel group privileges set for the su command. (${TARGET_LIST})"
+						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+						echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+						sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
+					fi
+				else
+					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check : OK"
+				fi
+
+				################ Independent Processing Logic [ END ]################
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				################ Independent Processing Logic [ BEGIN ] ################
+
+				FUNCT_CHECK_FILE ${TARGET_LIST}
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					CHECK_SECURITY_PARAM=`grep "^auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | wc -l`
+					if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+					then
+						FUNCT_BACKUP_FILE ${TARGET_LIST}
+						TARGET_LINE_NO=`grep -n "^#\s*auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | cut -d : -f1 | awk '{print $1 + 1}'`
+						ADD_CONFIG=$(printf "auth\t\trequired\tpam_wheel.so use_uid")
+
+						echo "[WARN] ${HOSTNAME} There is no wheel group privileges set for the su command. (${TARGET_LIST})"
+						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+						echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+						sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
+					fi
+				else
+					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check : OK"
+				fi
+
+				################ Independent Processing Logic [ END ]################
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -2896,6 +2994,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U42 ${WORK_TYPE}
 	FUNCT_U43 ${WORK_TYPE} ### Exception : You must manually check the log management policy.
 	FUNCT_U44 ${WORK_TYPE}
+	FUNCT_U45 ${WORK_TYPE}
 }
 
 ##############################################################################
