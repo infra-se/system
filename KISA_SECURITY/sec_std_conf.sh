@@ -438,7 +438,7 @@ FUNCT_SHOW_PROGRESS() {
 	do
 		for (( i=0; i<${#PROGRESS_BAR}; i++ ));
 		do
-			echo -ne "\r[${PROGRESS_BAR:$i:1}] Please wait for a moment. Progress ..." 
+			echo -ne "\r[${PROGRESS_BAR:$i:1}] Please wait. Progress ..." 
 			sleep 0.1
 		done
 	done
@@ -1120,7 +1120,6 @@ FUNCT_U13() {
 		exit 1
 	fi
 }
-
 
 
 FUNCT_U14() {
@@ -2754,10 +2753,14 @@ FUNCT_U35() {
 
 	WORK_TYPE=$1
 
-	if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+	if [ ${WORK_TYPE} == "PROC" ]
 	then
 		EXT_MSG="This item was excluded because it requires MW Specific diagnostics."
 		FUNCT_EXCEPTION "${EXT_MSG}"
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U35."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2791,6 +2794,61 @@ FUNCT_U42() {
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
 		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U42."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U43() {
+	echo
+	#########################
+	echo "### PROCESS U43 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		EXT_MSG="You must Manually check the log management policy."
+		FUNCT_EXCEPTION "${EXT_MSG}"
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U43."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U44() {
+	echo
+	#########################
+	echo "### PROCESS U44 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`egrep -v "^root|nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			CHECK_ID=`id -u ${LIST}`
+
+			if [ ${CHECK_ID} -eq 0 ] 
+			then
+				echo "[WARN] ${HOSTNAME} WARNING !!! You have been assigned UID 0. (${LIST} / UID ${CHECK_ID}) : Not OK"
+			else
+				echo "[INFO] ${HOSTNAME} No problem UID. (${LIST} / UID ${CHECK_ID}) : OK"
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U44."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -2836,6 +2894,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U34 ${WORK_TYPE}
 	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41
 	FUNCT_U42 ${WORK_TYPE}
+	FUNCT_U43 ${WORK_TYPE} ### Exception : You must manually check the log management policy.
+	FUNCT_U44 ${WORK_TYPE}
 }
 
 ##############################################################################
