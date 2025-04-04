@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250403
+SCRIPT_VERSION=0.9.20250404
 
 export LANG=C
 export LC_ALL=C
@@ -9,6 +9,7 @@ export LC_ALL=C
 WORK_TYPE=$1
 readonly DATE_TIME=`date '+%Y%m%d_%H%M%S'`
 LOG_DIR=/root/shell/KISA_SECURITY/logs
+CVE_RESULT_LOG=/tmp/cve_result.log
 COMMON_VARS_DIR=/root/shell/KISA_SECURITY
 COMMON_VARS=${COMMON_VARS_DIR}/common
 BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP
@@ -410,7 +411,6 @@ FUNCT_CHECK_PORT() {
 	fi
 }
 
-
 FUNCT_CHECK_PORT_LOOP() {
 	TARGET_SERVICE_PORT=$1
 	CHECK_ALL_PORT=0
@@ -432,6 +432,40 @@ FUNCT_CHECK_PORT_LOOP() {
 	done
 }
 
+FUNCT_SHOW_PROGRESS() {
+	PROGRESS_BAR="/-\|"
+	while true;
+	do
+		for (( i=0; i<${#PROGRESS_BAR}; i++ ));
+		do
+			echo -ne "\r[${PROGRESS_BAR:$i:1}] Please wait for a moment. Progress ..." 
+			sleep 0.1
+		done
+	done
+}
+
+FUNCT_SEARCH_CVE() {
+	if [ ${OS_PLATFORM} == "RHEL" ]
+	then
+		PKG_LIST=`rpm -qa`	
+
+	elif [ ${OS_PLATFORM} == "UBUNTU" ]
+	then
+		PKG_LIST=`find /usr/share/doc/ -type f -name \*.gz`
+	fi
+
+	for LIST in ${PKG_LIST}
+	do
+		if [ ${OS_PLATFORM} == "RHEL" ]
+		then
+			rpm -qi ${LIST} --changelog | grep -o "CVE-[0-9]\{4\}-[0-9]\{4\}"
+		elif [ ${OS_PLATFORM} == "UBUNTU" ]
+		then
+			zgrep -i "cve-" ${LIST} | grep -o "CVE-[0-9]\{4\}-[0-9]\{4\}"
+		fi
+	done
+
+}
 
 ###################################
 ###### MAIN PROCESS FUNCTION ######
@@ -761,10 +795,17 @@ FUNCT_U06() {
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
+		FUNCT_SHOW_PROGRESS &
+		PROGRESS_PID=$!
+
 		TARGET_LIST=${BACKUP_ROOT_DIR}/NONE_USER_LIST
 		find / ! \( \( -path '/proc' -o -path '/root/shell/CONF_BACKUP' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/app/data/kubelet' \) -prune \) -type f -a -nouser -exec ls -a1Ld {} \; > ${TARGET_LIST}
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		kill ${PROGRESS_PID}
+		wait ${PROGRESS_PID} 2>/dev/null
+		echo ""
 
 		if [ "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
@@ -1128,10 +1169,17 @@ FUNCT_U15() {
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
+		FUNCT_SHOW_PROGRESS &
+		PROGRESS_PID=$!
+
 		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
 		find / ! \( \( -path '/proc' -o -path '/root/shell/CONF_BACKUP' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/sys' \) -prune \) -type f -perm -2 -exec ls -1 {} \; > ${TARGET_LIST}
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
+
+		kill ${PROGRESS_PID}
+		wait ${PROGRESS_PID} 2>/dev/null
+		echo ""
 
 		if [ "${CHECK_TARGET_OBJECT}" -gt 0 ]
 		then
@@ -2716,6 +2764,39 @@ FUNCT_U35() {
 	fi
 }
 
+FUNCT_U42() {
+	echo
+	#########################
+	echo "### PROCESS U42 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		FUNCT_SHOW_PROGRESS &
+		PROGRESS_PID=$!
+
+		FUNCT_SEARCH_CVE | sort -u > ${CVE_RESULT_LOG}
+		
+		kill ${PROGRESS_PID}
+		wait ${PROGRESS_PID} 2>/dev/null
+		echo ""
+
+		for LIST in `cat ${CVE_RESULT_LOG}`
+		do
+			echo "[INFO] ${HOSTNAME} ${LIST} Patched : OK"
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U42."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -2754,6 +2835,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U33 ${WORK_TYPE}
 	FUNCT_U34 ${WORK_TYPE}
 	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41
+	FUNCT_U42 ${WORK_TYPE}
 }
 
 ##############################################################################
