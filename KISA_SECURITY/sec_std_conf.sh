@@ -2755,7 +2755,7 @@ FUNCT_U35() {
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
-		EXT_MSG="This item was excluded because it requires MW Specific diagnostics."
+		EXT_MSG="This item is excluded because it requires MW Specific diagnostics."
 		FUNCT_EXCEPTION "${EXT_MSG}"
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -3118,6 +3118,70 @@ FUNCT_U48() {
 	fi
 }
 
+FUNCT_U49() {
+	echo
+	#########################
+	echo "### PROCESS U49 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`egrep -v "^root|nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ -z "${TARGET_LIST}" ]
+		then
+			echo "[INFO] ${HOSTNAME} There are no accounts other than the system default account. : OK"
+		else
+			for LIST in ${TARGET_LIST}
+			do
+				echo "[CHECK] ${HOSTNAME} Please check if you need an account. (${LIST})"
+			done
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U49."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U50() {
+	echo
+	#########################
+	echo "### PROCESS U50 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/group
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		RECOMMEND_VARS="root:x:0:"
+		CHECK_VARS=`grep "^root" ${TARGET_LIST}`
+
+		if [ "${CHECK_VARS}" == "${RECOMMEND_VARS}" ]  
+		then
+			echo "[INFO] ${HOSTNAME} This system administrator group setting is normal. : OK"
+		else
+			CHECK_OTHER_ADM_GROUPS=`grep "^root" /etc/group | cut -d : -f4`
+			echo "[WARN] ${HOSTNAME} WARNING!!! Non-root user found in group GID 0. (${CHECK_OTHER_ADM_GROUPS}) : Not OK"
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U50."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -3163,6 +3227,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U46 ${WORK_TYPE}
 	FUNCT_U47 ${WORK_TYPE}
 	FUNCT_U48 ${WORK_TYPE}
+	FUNCT_U49 ${WORK_TYPE}
+	FUNCT_U50 ${WORK_TYPE}
 }
 
 ##############################################################################
