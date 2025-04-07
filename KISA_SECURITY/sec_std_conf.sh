@@ -3181,6 +3181,38 @@ FUNCT_U50() {
 	fi
 }
 
+FUNCT_U51() {
+	echo
+	#########################
+	echo "### PROCESS U51 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`awk -F":" '$3 >= 1000 {print $1}' /etc/group`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			CHECK_USER=`id ${LIST} 2>&1 | grep "no such user" | wc -l`
+			if [ ${CHECK_USER} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} This is a group in which the account exists. (${LIST}) : OK"	
+			else
+				echo "[WARN] ${HOSTNAME} WARNING!!! This group does not have an account. (${LIST}) : Not OK" 
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U51."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -3229,6 +3261,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U48 ${WORK_TYPE}
 	FUNCT_U49 ${WORK_TYPE}
 	FUNCT_U50 ${WORK_TYPE}
+	FUNCT_U51 ${WORK_TYPE}
 }
 
 ##############################################################################
