@@ -2938,6 +2938,185 @@ FUNCT_U45() {
 	fi
 }
 
+FUNCT_U46() {
+	echo
+	#########################
+	echo "### PROCESS U46 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/login.defs
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" -o ${OS_PLATFORM} = "RHEL" ]
+		then
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			FUNCT_CHECK_FILE ${TARGET_LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_BACKUP_FILE ${TARGET_LIST}
+				ADD_CONFIG=$(printf "PASS_MIN_LEN\t8")
+				CHECK_SECURITY_PARAM=`grep "^PASS_MIN_LEN\s*" ${TARGET_LIST} | wc -l`
+
+				if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Minimum password length configuration not found. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
+				else
+					TARGET_LINE_NO=`grep -n "^PASS_MIN_LEN\s*" ${TARGET_LIST} | cut -d: -f1`
+					echo "[INFO] ${HOSTNAME} Set Minimum password length configuration. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-46 Check : OK"
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U47() {
+	echo
+	#########################
+	echo "### PROCESS U47 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/login.defs
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" -o ${OS_PLATFORM} = "RHEL" ]
+		then
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			FUNCT_CHECK_FILE ${TARGET_LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_BACKUP_FILE ${TARGET_LIST}
+				ADD_CONFIG=$(printf "PASS_MAX_DAYS\t90")
+				CHECK_SECURITY_PARAM=`grep "^PASS_MAX_DAYS\s*" ${TARGET_LIST} | wc -l`
+
+				if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Maximum password age configuration not found. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
+				else
+					TARGET_LINE_NO=`grep -n "^PASS_MAX_DAYS\s*" ${TARGET_LIST} | cut -d: -f1`
+					echo "[INFO] ${HOSTNAME} Set Maximum password configuration. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-47 Check : OK"
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U48() {
+	echo
+	#########################
+	echo "### PROCESS U48 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/login.defs
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" -o ${OS_PLATFORM} = "RHEL" ]
+		then
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			FUNCT_CHECK_FILE ${TARGET_LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_BACKUP_FILE ${TARGET_LIST}
+				ADD_CONFIG=$(printf "PASS_MIN_DAYS\t1")
+				CHECK_SECURITY_PARAM=`grep "^PASS_MIN_DAYS\s*" ${TARGET_LIST} | wc -l`
+
+				if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Minimum password age configuration not found. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
+				else
+					TARGET_LINE_NO=`grep -n "^PASS_MIN_DAYS\s*" ${TARGET_LIST} | cut -d: -f1`
+					echo "[INFO] ${HOSTNAME} Set Minimum password configuration. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-48 Check : OK"
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -2981,6 +3160,9 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U43 ${WORK_TYPE} ### Exception : You must manually check the log management policy.
 	FUNCT_U44 ${WORK_TYPE}
 	FUNCT_U45 ${WORK_TYPE}
+	FUNCT_U46 ${WORK_TYPE}
+	FUNCT_U47 ${WORK_TYPE}
+	FUNCT_U48 ${WORK_TYPE}
 }
 
 ##############################################################################
