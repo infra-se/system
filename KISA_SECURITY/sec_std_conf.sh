@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250404
+SCRIPT_VERSION=0.9.20250407
 
 export LANG=C
 export LC_ALL=C
@@ -2881,14 +2881,10 @@ FUNCT_U45() {
 					CHECK_SECURITY_PARAM=`grep "^auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | wc -l`
 					if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
 					then
-						FUNCT_BACKUP_FILE ${TARGET_LIST}
-						TARGET_LINE_NO=`grep -n "^#\s*auth\s*required\s*pam_wheel.so$" ${TARGET_LIST} | cut -d : -f1 | awk '{print $1 + 1}'`
 						ADD_CONFIG=$(printf "auth\t\trequired\tpam_wheel.so use_uid group=sudo")
 
-						echo "[WARN] ${HOSTNAME} There is no wheel group privileges set for the su command. (${TARGET_LIST})"
-						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
-						echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
-						sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+						echo "[WARN] ${HOSTNAME} You need to manually configure wheel group permissions for the su command. (${TARGET_LIST})"
+						echo "[RECOMMEND] : ${ADD_CONFIG}"
 					else
 						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
 					fi
@@ -2914,14 +2910,10 @@ FUNCT_U45() {
 					CHECK_SECURITY_PARAM=`grep "^auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | wc -l`
 					if [ ${CHECK_SECURITY_PARAM} -eq 0 ]
 					then
-						FUNCT_BACKUP_FILE ${TARGET_LIST}
-						TARGET_LINE_NO=`grep -n "^#\s*auth\s*required\s*pam_wheel.so" ${TARGET_LIST} | cut -d : -f1 | awk '{print $1 + 1}'`
 						ADD_CONFIG=$(printf "auth\t\trequired\tpam_wheel.so use_uid")
 
-						echo "[WARN] ${HOSTNAME} There is no wheel group privileges set for the su command. (${TARGET_LIST})"
-						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
-						echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
-						sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
+						echo "[WARN] ${HOSTNAME} You need to manually configure wheel group permissions for the su command. (${TARGET_LIST})"
+						echo "[RECOMMEND] : ${ADD_CONFIG}"
 					else
 						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
 					fi
@@ -2939,13 +2931,7 @@ FUNCT_U45() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		FUNCT_CHECK_FILE ${TARGET_LIST}
-		if [ ${CHECK_RESULT} -eq 0 ]
-		then
-			FUNCT_RESTORE_FILE ${TARGET_LIST}
-		else
-			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
-		fi
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U45."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
