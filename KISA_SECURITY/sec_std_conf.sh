@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250407
+SCRIPT_VERSION=0.9.20250408
 
 export LANG=C
 export LC_ALL=C
@@ -3193,20 +3193,63 @@ FUNCT_U51() {
 
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
-		for LIST in ${TARGET_LIST}
-		do
-			CHECK_USER=`id ${LIST} 2>&1 | grep "no such user" | wc -l`
-			if [ ${CHECK_USER} -eq 0 ]
-			then
-				echo "[INFO] ${HOSTNAME} This is a group in which the account exists. (${LIST}) : OK"	
-			else
-				echo "[WARN] ${HOSTNAME} WARNING!!! This group does not have an account. (${LIST}) : Not OK" 
-			fi
-		done
+
+		if [ -z "${TARGET_LIST}" ]
+		then
+			echo "[CHECK] ${HOSTNAME} This system is U-51 Check : OK"
+		else
+			for LIST in ${TARGET_LIST}
+			do
+				CHECK_USER=`id ${LIST} 2>&1 | grep "no such user" | wc -l`
+				if [ ${CHECK_USER} -eq 0 ]
+				then
+					echo "[INFO] ${HOSTNAME} This is a group in which the account exists. (${LIST}) : OK"	
+				else
+					echo "[WARN] ${HOSTNAME} WARNING!!! This group does not have an account. (${LIST}) : Not OK" 
+				fi
+			done
+		fi
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
 		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U51."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U52() {
+	echo
+	#########################
+	echo "### PROCESS U52 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`getent passwd | cut -d : -f3 | sort | uniq -d`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+
+		if [ -z ${TARGET_LIST} ]
+		then
+			echo "[CHECK] ${HOSTNAME} There are no accounts with duplicate UIDs. : OK"
+		else
+			for LIST in ${TARGET_LIST}
+			do
+				CHECK_DUP_USER=`awk -F: '$3 == "1000" {print "ID : "$1" / UID : "$3}' /etc/passwd`
+
+				while IFS= read -r LIST
+				do
+					echo "[WARN] ${HOSTNAME} WARNING!!! An account with a duplicate UID was found. (${LIST}) : Not OK"
+				done < <(echo "${CHECK_DUP_USER}") 
+			done
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U52."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -3262,6 +3305,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U49 ${WORK_TYPE}
 	FUNCT_U50 ${WORK_TYPE}
 	FUNCT_U51 ${WORK_TYPE}
+	FUNCT_U52 ${WORK_TYPE}
 }
 
 ##############################################################################
