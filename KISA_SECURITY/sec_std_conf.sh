@@ -2327,7 +2327,7 @@ FUNCT_U31() {
 								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2366,7 +2366,7 @@ FUNCT_U31() {
 								echo "[INFO] ${HOSTNAME} This System is U-31 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-31 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2448,7 +2448,7 @@ FUNCT_U32() {
 								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2496,7 +2496,7 @@ FUNCT_U32() {
 								echo "[INFO] ${HOSTNAME} This System is U-32 Check : OK (${TARGET_LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-32 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2672,7 +2672,7 @@ FUNCT_U34() {
 								echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2714,7 +2714,7 @@ FUNCT_U34() {
 								echo "[INFO] ${HOSTNAME} This System is U-34 Check : OK (${LIST})"	
 							fi
 						else
-							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check : OK"
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-34 Check."
 						fi
 
 						################ Independent Processing Logic [ END ]################
@@ -2889,7 +2889,7 @@ FUNCT_U45() {
 						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
 					fi
 				else
-					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check : OK"
+					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check."
 				fi
 
 				################ Independent Processing Logic [ END ]################
@@ -2918,7 +2918,7 @@ FUNCT_U45() {
 						echo "[INFO] ${HOSTNAME} This System is U-45 Check : OK"	
 					fi
 				else
-					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check : OK"
+					echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-45 Check."
 				fi
 
 				################ Independent Processing Logic [ END ]################
@@ -2975,7 +2975,7 @@ FUNCT_U46() {
 					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
 				fi
 			else
-				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-46 Check : OK"
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-46 Check."
 			fi
 
 			################ Independent Processing Logic [ END ]################
@@ -3035,7 +3035,7 @@ FUNCT_U47() {
 					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
 				fi
 			else
-				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-47 Check : OK"
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-47 Check."
 			fi
 
 			################ Independent Processing Logic [ END ]################
@@ -3095,7 +3095,7 @@ FUNCT_U48() {
 					sed -i "${TARGET_LINE_NO}d" ${TARGET_LIST} && sed -i "${TARGET_LINE_NO}i\\${ADD_CONFIG}" ${TARGET_LIST}
 				fi
 			else
-				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-48 Check : OK"
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-48 Check."
 			fi
 
 			################ Independent Processing Logic [ END ]################
@@ -3289,6 +3289,71 @@ FUNCT_U53() {
 }
 
 
+FUNCT_U54() {
+	echo
+	#########################
+	echo "### PROCESS U54 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/profile
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" -o ${OS_PLATFORM} = "RHEL" ]
+		then
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			FUNCT_CHECK_FILE ${TARGET_LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				CHECK_ENV_TMOUT=`echo ${TMOUT}`
+				ADD_CONFIG=$(printf "export TMOUT=600")
+
+				if [ -z "${CHECK_ENV_TMOUT}" ] 
+				then
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
+					echo "[WARN] ${HOSTNAME} You need to set Shell TMOUT. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
+				
+				elif [ ${CHECK_ENV_TMOUT} -gt 0 -a ${CHECK_ENV_TMOUT} -le 600 ]
+				then
+					echo "[INFO] ${HOSTNAME} This system is U-54 Check : OK (TimeOut : ${CHECK_ENV_TMOUT})" 	
+				else
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
+					echo "[INFO] ${HOSTNAME} You need to change config Shell TMOUT. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					sed -i '/TMOUT/d' ${TARGET_LIST} 
+					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-54 Check."
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -3339,6 +3404,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U51 ${WORK_TYPE}
 	FUNCT_U52 ${WORK_TYPE}
 	FUNCT_U53 ${WORK_TYPE}
+	FUNCT_U54 ${WORK_TYPE}
 }
 
 ##############################################################################
