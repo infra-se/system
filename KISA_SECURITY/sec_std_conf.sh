@@ -908,7 +908,7 @@ FUNCT_U08() {
 FUNCT_U09() {
 	echo
 	#########################
-	echo "### PROCESS U07, U09, U10, U12 ###"
+	echo "### PROCESS U07, U09, U10, U12, U55 ###"
 	#########################
 
 	WORK_TYPE=$1
@@ -928,6 +928,7 @@ FUNCT_U09() {
 	/etc/xinetd.d/time-stream
 	/etc/xinetd.d/tftp
 	/etc/shadow
+	/etc/hosts.lpd
 	"
 
 	PERM_644_LIST="
@@ -958,6 +959,8 @@ FUNCT_U09() {
 
 				echo "[INFO] ${HOSTNAME} Change File Permission 600 : ${LIST}"
 				chmod 600 ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Target file not found. : ${LIST}"
 			fi
 		done
 
@@ -3368,7 +3371,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U05 ${WORK_TYPE}
 	FUNCT_U06 ${WORK_TYPE}
 	FUNCT_U08 ${WORK_TYPE}
-	FUNCT_U09 ${WORK_TYPE} ### with U07, U10, U12 ###
+	FUNCT_U09 ${WORK_TYPE} ### with U07, U10, U12, U55 ###
 	FUNCT_U11 ${WORK_TYPE}
 	FUNCT_U13 ${WORK_TYPE}
 	FUNCT_U14 ${WORK_TYPE}
