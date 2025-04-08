@@ -3196,7 +3196,7 @@ FUNCT_U51() {
 
 		if [ -z "${TARGET_LIST}" ]
 		then
-			echo "[INFO] ${HOSTNAME} This system is U-51 Check : OK"
+			echo "[INO] ${HOSTNAME} This system is U-51 Check : OK"
 		else
 			for LIST in ${TARGET_LIST}
 			do
@@ -3232,7 +3232,7 @@ FUNCT_U52() {
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
 
-		if [ -z ${TARGET_LIST} ]
+		if [ -z "${TARGET_LIST}" ]
 		then
 			echo "[INFO] ${HOSTNAME} There are no accounts with duplicate UIDs. : OK"
 		else
@@ -3250,6 +3250,38 @@ FUNCT_U52() {
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
 		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U52."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U53() {
+	echo
+	#########################
+	echo "### PROCESS U53 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`egrep -v "^root|nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ -z "${TARGET_LIST}" ]
+		then
+			echo "[INFO] ${HOSTNAME} There are no accounts other than the system default account. : OK"
+		else
+			for LIST in ${TARGET_LIST}
+			do
+				CHECK_SHELL=`getent passwd ${LIST} | awk -F: '{print $NF}'`
+				echo "[CHECK] ${HOSTNAME} You need to check user shell privileges. (${LIST} : ${CHECK_SHELL})"
+			done
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U53."
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -3306,6 +3338,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U50 ${WORK_TYPE}
 	FUNCT_U51 ${WORK_TYPE}
 	FUNCT_U52 ${WORK_TYPE}
+	FUNCT_U53 ${WORK_TYPE}
 }
 
 ##############################################################################
