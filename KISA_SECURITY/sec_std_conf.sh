@@ -1277,7 +1277,7 @@ FUNCT_U16() {
 	
 					################ Independent Processing Logic [ END ] ################
 				else
-					echo "[OK] ${HOSTNAME} Does not exist : ${LIST}" 
+					echo "[INFO] ${HOSTNAME} ${LIST} Does not exist : OK" 
 				fi
 			done
 		else
