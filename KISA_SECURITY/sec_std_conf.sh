@@ -3196,7 +3196,7 @@ FUNCT_U51() {
 
 		if [ -z "${TARGET_LIST}" ]
 		then
-			echo "[CHECK] ${HOSTNAME} This system is U-51 Check : OK"
+			echo "[INFO] ${HOSTNAME} This system is U-51 Check : OK"
 		else
 			for LIST in ${TARGET_LIST}
 			do
@@ -3234,7 +3234,7 @@ FUNCT_U52() {
 
 		if [ -z ${TARGET_LIST} ]
 		then
-			echo "[CHECK] ${HOSTNAME} There are no accounts with duplicate UIDs. : OK"
+			echo "[INFO] ${HOSTNAME} There are no accounts with duplicate UIDs. : OK"
 		else
 			for LIST in ${TARGET_LIST}
 			do
