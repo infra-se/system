@@ -960,7 +960,7 @@ FUNCT_U09() {
 				echo "[INFO] ${HOSTNAME} Change File Permission 600 : ${LIST}"
 				chmod 600 ${LIST}
 			else
-				echo "[INFO] ${HOSTNAME} Target file not found. : ${LIST}"
+				echo "[INFO] ${HOSTNAME} ${LIST} Does not exist : OK"
 			fi
 		done
 
@@ -1107,7 +1107,7 @@ FUNCT_U13() {
 				echo "[INFO] ${HOSTNAME} Remove Set UID : ${TARGET_LIST}"
 				chmod u-s ${TARGET_LIST}
 			else
-				echo "[INFO] ${HOSTNAME} ${TARGET_LIST} file does not exist : OK"
+				echo "[INFO] ${HOSTNAME} ${TARGET_LIST} Does not exist : OK"
 			fi
 		done
 
@@ -1195,7 +1195,7 @@ FUNCT_U15() {
 					FUNCT_CHECK_PERM ${LIST}
 					FUNCT_BACKUP_PERM ${LIST}
 				else
-					echo "[INFO] ${HOSTNAME} ${LIST} file does not exist : OK"
+					echo "[INFO] ${HOSTNAME} ${LIST} Does not exist : OK"
 				fi
 				
 				################ Independent Processing Logic [ BEGIN ] ################
@@ -3320,6 +3320,7 @@ FUNCT_U54() {
 					echo "[WARN] ${HOSTNAME} You need to set Shell TMOUT. (${TARGET_LIST})"
 					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG}"
+					sed -i '/TMOUT/d' ${TARGET_LIST} 
 					echo "${ADD_CONFIG}" >> ${TARGET_LIST}
 				
 				elif [ ${CHECK_ENV_TMOUT} -gt 0 -a ${CHECK_ENV_TMOUT} -le 600 ]
