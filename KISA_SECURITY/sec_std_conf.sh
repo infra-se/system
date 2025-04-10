@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250408
+SCRIPT_VERSION=0.9.20250410
 
 export LANG=C
 export LC_ALL=C
@@ -3358,6 +3358,67 @@ FUNCT_U54() {
 	fi
 }
 
+FUNCT_U56() {
+	echo
+	#########################
+	echo "### PROCESS U56 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/profile
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" -o ${OS_PLATFORM} = "RHEL" ]
+		then
+			################ Independent Processing Logic [ BEGIN ] ################
+
+			FUNCT_CHECK_FILE ${TARGET_LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				CHECK_ENV_UMASK=`umask`
+				ADD_CONFIG1=$(printf "umask 022 ### Add set umask ${DATE_TIME} : $0 ###")
+				ADD_CONFIG2=$(printf "export umask ### Add set umask ${DATE_TIME} : $0 ###")
+
+				if [ "${CHECK_ENV_UMASK}" != "0022" ] 
+				then
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
+					echo "[WARN] ${HOSTNAME} You need to set UMASK. (${TARGET_LIST})"
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG1}"
+					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG2}"
+					sed -i '/Add set umask/d' ${TARGET_LIST} 
+					echo "${ADD_CONFIG1}" >> ${TARGET_LIST}
+					echo "${ADD_CONFIG2}" >> ${TARGET_LIST}
+				else
+					echo "[INFO] ${HOSTNAME} This system is U-56 Check : OK (UMASK : ${CHECK_ENV_UMASK})" 	
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-56 Check."
+			fi
+
+			################ Independent Processing Logic [ END ]################
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_FILE ${TARGET_LIST}
+		if [ ${CHECK_RESULT} -eq 0 ]
+		then
+			FUNCT_RESTORE_FILE ${TARGET_LIST}
+		else
+			echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${TARGET_LIST}"
+		fi
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -3409,6 +3470,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U52 ${WORK_TYPE}
 	FUNCT_U53 ${WORK_TYPE}
 	FUNCT_U54 ${WORK_TYPE}
+	FUNCT_U56 ${WORK_TYPE}
 }
 
 ##############################################################################
