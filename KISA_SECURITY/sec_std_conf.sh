@@ -1164,9 +1164,9 @@ FUNCT_U14() {
 
 					elif [ ${CHECK_FILE_OWNER_VAL} != "${LIST}" ]
 					then
-						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL} : [RECOMMEND] chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF})"
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL}) [RECOMMEND] chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
 					else
-						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Permissions include Other user permissions (${CHECK_FILE_PERM_VAL} : [RECOMMEND] chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF})"
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Permissions include Other user permissions (${CHECK_FILE_PERM_VAL}) [RECOMMEND] chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
 					fi
 				fi
 			done
@@ -3459,7 +3459,7 @@ FUNCT_U57() {
 
 			if [ ${OTHER_DIR_PERM} -eq 0 -a ${CHECK_FILE_OWNER_VAL} == "${LIST}" ] 
 			then
-				echo "[INFO] ${HOSTNAME} ${LIST} : Check OK. Home DIR permissions and Owner. (${CHECK_FILE_PERM_VAL} / ${CHECK_FILE_OWNER_VAL}) : ${CHECK_HOME_DIR}"
+				echo "[INFO] ${HOSTNAME} ${LIST} : Home DIR permissions and Owner Check OK. (${CHECK_FILE_PERM_VAL} / ${CHECK_FILE_OWNER_VAL}) : ${CHECK_HOME_DIR}"
 
 			elif [ ${CHECK_FILE_OWNER_VAL} != "${LIST}" ]
 			then
