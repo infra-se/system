@@ -219,6 +219,19 @@ FUNCT_RESTORE_PERM() {
 	fi
 }
 
+FUNCT_CHECK_DIR() {
+	TARGET_LIST=$1
+        CHECK_STAT=`stat -c %F ${TARGET_LIST} | grep "directory" | wc -l`
+        if [ ${CHECK_STAT} -eq 0 ]
+        then
+		### FILE TYPE ###
+		export CHECK_DIR_STAT=1
+	else
+		### DIR TYPE ###
+		export CHECK_DIR_STAT=0
+	fi
+}
+
 FUNCT_CHECK_SYMBOLIC() {
 	TARGET_LIST=$1
         CHECK_SYMBOLIC_LINK=`stat -c %F ${TARGET_LIST} | grep "symbolic" | wc -l`
@@ -3497,6 +3510,102 @@ FUNCT_U57() {
 	fi
 }
 
+FUNCT_U58() {
+	echo
+	#########################
+	echo "### PROCESS U58 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			CHECK_HOME_DIR=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | awk -F : '$1 ~ /^'"${LIST}"'$/ {print $6}'`
+			FUNCT_CHECK_FILE ${CHECK_HOME_DIR}
+
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				echo "[INFO] ${HOSTNAME} ${LIST} : Home DIR exists OK. : ${CHECK_HOME_DIR}"
+			else
+				echo "[WARN] ${HOSTNAME} ${LIST} : Home DIR does not exists. : ${CHECK_HOME_DIR}"
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U58."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U59() {
+	echo
+	#########################
+	echo "### PROCESS U59 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+EX_LIST="
+.bash_logout
+.bash_profile
+.bashrc
+.cshrc
+.tcshrc
+.cache
+.config
+.bash_history
+.pki
+.ansible
+.ansible.cfg
+.ssh
+.vim
+.viminfo
+.aws
+.minio
+.minio.sys
+"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		echo "[EXCEPTION] ${HOSTNAME} : /proc, /usr, /boot, /var/lib, /run, /etc/skel, /tmp, /sys"
+		FIND_CMD_OPT=(/ ! \( \( -path '/proc' -o -path '/usr' -o -path '/boot' -o -path '/var/lib' -o -path '/run' -o -path '/etc/skel' -o -path '/tmp' -o -path '/sys' \) -prune \) -name ".*")
+
+		IFS=$'\n'
+		for OPT_LIST in ${EX_LIST}
+		do
+			FIND_CMD_OPT+=( ! -name "$OPT_LIST" )
+		done
+
+		TARGET_LIST=`find "${FIND_CMD_OPT[@]}" 2>/dev/null`
+
+		for LIST in ${TARGET_LIST}
+		do
+			FUNCT_CHECK_DIR ${LIST}
+
+			if [ ${CHECK_DIR_STAT} -eq 0 ]
+			then
+				echo "[WARN] ${HOSTNAME} : You need to Check Hidden directorys. : ${LIST}"
+			else
+				echo "[WARN] ${HOSTNAME} : You need to Check Hidden files. : ${LIST}"
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U59."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -3551,6 +3660,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U54 ${WORK_TYPE}
 	FUNCT_U56 ${WORK_TYPE}
 	FUNCT_U57 ${WORK_TYPE}
+	FUNCT_U58 ${WORK_TYPE}
+	FUNCT_U59 ${WORK_TYPE}
 }
 
 ##############################################################################
