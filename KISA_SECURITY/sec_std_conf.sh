@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250410
+SCRIPT_VERSION=0.9.20250411
 
 export LANG=C
 export LC_ALL=C
@@ -156,8 +156,8 @@ FUNCT_CHECK_FILE() {
 FUNCT_CHECK_PERM() {
 	TARGET_LIST=$1
 	CHECK_FILE_PERM=`stat -c '%a' ${TARGET_LIST}`
-	CHECK_FILE_OWNER=`ls -l ${TARGET_LIST} | awk '{print $3}'`
-	CHECK_FILE_GROUP=`ls -l ${TARGET_LIST} | awk '{print $4}'`
+	CHECK_FILE_OWNER=`ls -ld ${TARGET_LIST} | awk '{print $3}'`
+	CHECK_FILE_GROUP=`ls -ld ${TARGET_LIST} | awk '{print $4}'`
 	export CHECK_FILE_PERM_VAL=${CHECK_FILE_PERM}
 	export CHECK_FILE_OWNER_VAL=${CHECK_FILE_OWNER}
 	export CHECK_FILE_GROUP_VAL=${CHECK_FILE_GROUP}
@@ -1135,20 +1135,41 @@ FUNCT_U14() {
 
 	TARGET_LIST=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
 
+	SHELL_ENV_LIST="
+	.bashrc
+	.bash_profile
+	.profile
+	.kshrc
+	.cshrc
+	.login
+	"
+
 	if [ ${WORK_TYPE} == "PROC" ]
 	then
 		for LIST in ${TARGET_LIST}
 		do
 			CHECK_HOME_DIR=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | awk -F : '$1 ~ /^'"${LIST}"'$/ {print $6}'`
-			FULL_DIR_PERM=`stat -c '%a' ${CHECK_HOME_DIR}`
-			OTHER_DIR_PERM=`stat -c '%a' ${CHECK_HOME_DIR} | cut -c 3`
 
-			if [ ${OTHER_DIR_PERM} -eq 0 ] 
-			then
-				echo "[INFO] ${HOSTNAME} ${LIST} : No problem with Home DIR permissions (${FULL_DIR_PERM}) : ${CHECK_HOME_DIR}"
-			else
-				echo "[WARN] ${HOSTNAME} ${LIST} : HOME DIR permissions include other user permissions (${FULL_DIR_PERM}) : ${CHECK_HOME_DIR}"
-			fi
+			for SHELL_ENV_CONF in ${SHELL_ENV_LIST}
+			do
+				FUNCT_CHECK_FILE ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_CHECK_PERM ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+					OTHER_DIR_PERM=`echo "${CHECK_FILE_PERM_VAL}" | cut -c 3`
+
+					if [ ${OTHER_DIR_PERM} -eq 0 -a ${CHECK_FILE_OWNER_VAL} == "${LIST}" ] 
+					then
+						echo "[INFO] ${HOSTNAME} ${LIST} : Shell ENV Permissions and Owner OK. (${CHECK_FILE_PERM_VAL} / ${CHECK_FILE_OWNER_VAL}) : ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
+
+					elif [ ${CHECK_FILE_OWNER_VAL} != "${LIST}" ]
+					then
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL} : [RECOMMEND] chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF})"
+					else
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Permissions include Other user permissions (${CHECK_FILE_PERM_VAL} : [RECOMMEND] chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF})"
+					fi
+				fi
+			done
 		done
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
@@ -3418,6 +3439,45 @@ FUNCT_U56() {
 	fi
 }
 
+FUNCT_U57() {
+	echo
+	#########################
+	echo "### PROCESS U57 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | cut -d : -f1`
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			CHECK_HOME_DIR=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | awk -F : '$1 ~ /^'"${LIST}"'$/ {print $6}'`
+			FUNCT_CHECK_PERM ${CHECK_HOME_DIR}
+			OTHER_DIR_PERM=`echo "${CHECK_FILE_PERM_VAL}" | cut -c 3`
+
+			if [ ${OTHER_DIR_PERM} -eq 0 -a ${CHECK_FILE_OWNER_VAL} == "${LIST}" ] 
+			then
+				echo "[INFO] ${HOSTNAME} ${LIST} : Check OK. Home DIR permissions and Owner. (${CHECK_FILE_PERM_VAL} / ${CHECK_FILE_OWNER_VAL}) : ${CHECK_HOME_DIR}"
+
+			elif [ ${CHECK_FILE_OWNER_VAL} != "${LIST}" ]
+			then
+				echo "[WARN] ${HOSTNAME} ${LIST} : Home DIR Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL}) : ${CHECK_HOME_DIR}"
+			else
+				echo "[WARN] ${HOSTNAME} ${LIST} : HOME DIR permissions include other user permissions (${CHECK_FILE_PERM_VAL}) : ${CHECK_HOME_DIR}"
+			fi
+		done
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U57."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -3471,6 +3531,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U53 ${WORK_TYPE}
 	FUNCT_U54 ${WORK_TYPE}
 	FUNCT_U56 ${WORK_TYPE}
+	FUNCT_U57 ${WORK_TYPE}
 }
 
 ##############################################################################
