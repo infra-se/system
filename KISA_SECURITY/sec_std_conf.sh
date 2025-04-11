@@ -3858,6 +3858,60 @@ FUNCT_U63() {
 	fi
 }
 
+FUNCT_U64() {
+	echo
+	#########################
+	echo "### PROCESS U64 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST="
+	/etc/ftpusers
+	/etc/vsftpd/ftpusers
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			FUNCT_CHECK_FILE ${LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then 
+				CHECK_LIMIT_ROOT=`grep "root" ${LIST} | wc -l`
+				if [ "${CHECK_LIMIT_ROOT}" -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} You need to FTP access restriction root. : ${LIST}"
+					FUNCT_BACKUP_FILE ${LIST}
+					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : Add 'root' ${LIST}"
+					echo "root" >> ${LIST}
+				else
+					echo "[INFO] ${HOSTNAME} This System is U-64 Check : OK (FTP access restriction root. ${LIST})"
+				fi
+			else
+				echo "[INFO] ${HOSTNAME} This System is U-64 Check : OK (${LIST})"
+			fi
+		done
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			FUNCT_CHECK_FILE ${LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_RESTORE_FILE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${LIST}"
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
 
@@ -3917,6 +3971,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U61 ${WORK_TYPE}
 	FUNCT_U62 ${WORK_TYPE}
 	FUNCT_U63 ${WORK_TYPE}
+	FUNCT_U64 ${WORK_TYPE}
 }
 
 ##############################################################################
