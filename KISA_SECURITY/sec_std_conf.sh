@@ -1164,9 +1164,17 @@ FUNCT_U14() {
 
 					elif [ ${CHECK_FILE_OWNER_VAL} != "${LIST}" ]
 					then
-						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL}) [RECOMMEND] chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Owner information of the account does not match. (${CHECK_FILE_OWNER_VAL})"
+						FUNCT_BACKUP_FILE ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
+						chown ${LIST} ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+						echo
 					else
-						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Permissions include Other user permissions (${CHECK_FILE_PERM_VAL}) [RECOMMEND] chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
+						echo "[WARN] ${HOSTNAME} ${LIST} : Shell ENV Permissions include Other user permissions (${CHECK_FILE_PERM_VAL})"
+						FUNCT_BACKUP_FILE ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+						echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}"
+						chmod 640 ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+						echo
 					fi
 				fi
 			done
@@ -1174,7 +1182,18 @@ FUNCT_U14() {
 
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
-		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U14."
+		for LIST in ${TARGET_LIST}
+		do
+			CHECK_HOME_DIR=`egrep -v "nologin$|false$|sync$|shutdown$|halt$" /etc/passwd | awk -F : '$1 ~ /^'"${LIST}"'$/ {print $6}'`
+			for SHELL_ENV_CONF in ${SHELL_ENV_LIST}
+			do
+				FUNCT_CHECK_FILE ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+				if [ ${CHECK_RESULT} -eq 0 ]
+				then
+					FUNCT_RESTORE_FILE ${CHECK_HOME_DIR}/${SHELL_ENV_CONF}
+				fi
+			done
+		done
 	else
 		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
 		exit 1
@@ -3404,8 +3423,8 @@ FUNCT_U56() {
 
 				if [ "${CHECK_ENV_UMASK}" != "0022" ] 
 				then
-					FUNCT_BACKUP_FILE ${TARGET_LIST}
 					echo "[WARN] ${HOSTNAME} You need to set UMASK. (${TARGET_LIST})"
+					FUNCT_BACKUP_FILE ${TARGET_LIST}
 					echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : ${TARGET_LIST}"
 					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG1}"
 					echo "[INFO] ${HOSTNAME} ${TARGET_LIST} : ${ADD_CONFIG2}"
