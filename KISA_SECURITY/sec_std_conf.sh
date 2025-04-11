@@ -3597,6 +3597,8 @@ EX_LIST="
 			fi
 		done
 
+		unset IFS
+
 	elif [ ${WORK_TYPE} == "RESTORE" ]
 	then
 		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U59."
@@ -3606,6 +3608,84 @@ EX_LIST="
 	fi
 }
 
+FUNCT_U60() {
+	echo
+	#########################
+	echo "### PROCESS U60 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	sshd.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[INFO] ${HOSTNAME} This System is U-60 Check : OK (Enable : ${LIST})"	
+					else
+						echo "[WARN] ${HOSTNAME} SSH Service is not enabled. : Not OK"	
+						echo "[INFO] ${HOSTNAME} Enable and Start : ${LIST}"	
+						systemctl enable ${LIST}
+						systemctl start ${LIST}
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[INFO] ${HOSTNAME} This System is U-60 Check : OK (Enable : ${LIST})"	
+					else
+						echo "[WARN] ${HOSTNAME} SSH Service is not enabled. : Not OK"	
+						echo "[INFO] ${HOSTNAME} Enable and Start : ${LIST}"	
+						systemctl enable ${LIST}
+						systemctl start ${LIST}
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE_BACKUP ${LIST}	
+			if [ ${CHECK_SERVICE_BACKUP} -eq 0 ]
+			then
+				FUNCT_RESTORE_SERVICE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -3662,6 +3742,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U57 ${WORK_TYPE}
 	FUNCT_U58 ${WORK_TYPE}
 	FUNCT_U59 ${WORK_TYPE}
+	FUNCT_U60 ${WORK_TYPE}
 }
 
 ##############################################################################
