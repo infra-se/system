@@ -2,7 +2,7 @@
 #Script by helperchoi@gmail.com / Kwang Min Choi
 #This script supports RHEL 7.x, Ubuntu 18.04 LTS and later systemd-based OS.
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250414
+SCRIPT_VERSION=1.0.20250414
 
 export LANG=C
 export LC_ALL=C
@@ -2457,7 +2457,7 @@ FUNCT_U31() {
 FUNCT_U32() {
 	echo
 	#########################
-	echo "### PROCESS U32 ###"
+	echo "### PROCESS U32, U70 ###"
 	#########################
 
 	WORK_TYPE=$1
@@ -4329,6 +4329,87 @@ FUNCT_U69() {
 	fi
 }
 
+FUNCT_U72() {
+	echo
+	#########################
+	echo "### PROCESS U72 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	rsyslog.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[INFO] ${HOSTNAME} This System is U-72 Check : OK (Enable : ${LIST})"	
+					else
+						echo "[WARN] ${HOSTNAME} Syslog Service is not enabled. : Not OK"	
+						echo "[INFO] ${HOSTNAME} Enable and Start : ${LIST}"	
+						FUNCT_BACKUP_SERVICE ${LIST}
+						systemctl enable ${LIST}
+						systemctl start ${LIST}
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[INFO] ${HOSTNAME} This System is U-72 Check : OK (Enable : ${LIST})"	
+					else
+						echo "[WARN] ${HOSTNAME} Syslog Service is not enabled. : Not OK"	
+						echo "[INFO] ${HOSTNAME} Enable and Start : ${LIST}"	
+						FUNCT_BACKUP_SERVICE ${LIST}
+						systemctl enable ${LIST}
+						systemctl start ${LIST}
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_SERVICE_LIST}
+		do
+			FUNCT_CHECK_SERVICE_BACKUP ${LIST}	
+			if [ ${CHECK_SERVICE_BACKUP} -eq 0 ]
+			then
+				FUNCT_RESTORE_SERVICE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : Service backup)"
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -4364,11 +4445,11 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U29 ${WORK_TYPE}
 	FUNCT_U30 ${WORK_TYPE}
 	FUNCT_U31 ${WORK_TYPE}
-	FUNCT_U32 ${WORK_TYPE}
+	FUNCT_U32 ${WORK_TYPE} ### with U70 ###
 	FUNCT_U33 ${WORK_TYPE}
 	FUNCT_U34 ${WORK_TYPE}
 	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41, U71
-	#FUNCT_U42 ${WORK_TYPE}
+	FUNCT_U42 ${WORK_TYPE}
 	FUNCT_U43 ${WORK_TYPE} ### Exception : You must manually check the log management policy.
 	FUNCT_U44 ${WORK_TYPE}
 	FUNCT_U45 ${WORK_TYPE}
@@ -4395,6 +4476,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U67 ${WORK_TYPE}
 	FUNCT_U68 ${WORK_TYPE}
 	FUNCT_U69 ${WORK_TYPE}
+	FUNCT_U72 ${WORK_TYPE}
 }
 
 ##############################################################################
