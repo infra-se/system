@@ -2805,7 +2805,7 @@ FUNCT_U34() {
 FUNCT_U35() {
 	echo
 	#########################
-	echo "### PROCESS U35, U36, U37, U38, U39, U40, U41 ###"
+	echo "### PROCESS U35, U36, U37, U38, U39, U40, U41, U71 ###"
 	#########################
 
 	WORK_TYPE=$1
@@ -4182,6 +4182,153 @@ FUNCT_U67() {
 	fi
 }
 
+FUNCT_U68() {
+	echo
+	#########################
+	echo "### PROCESS U68 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST="
+	/etc/motd
+	/etc/issue
+	/etc/issue.net
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			FUNCT_CHECK_FILE ${LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then 
+				FUNCT_BACKUP_FILE ${LIST}
+				echo "[INFO] ${HOSTNAME} Change the Banner message file. : ${LIST}"
+				cat > ${LIST} << EOF
+				${MOTD_MESSAGE}
+EOF
+			else
+				echo "[INFO] ${HOSTNAME} Create Banner message file : ${LIST}"
+				cat > ${LIST} << EOF
+				${MOTD_MESSAGE}
+EOF
+			fi
+		done
+	
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for LIST in ${TARGET_LIST}
+		do
+			FUNCT_CHECK_FILE ${LIST}
+			if [ ${CHECK_RESULT} -eq 0 ]
+			then
+				FUNCT_RESTORE_FILE ${LIST}
+			else
+				echo "[INFO] ${HOSTNAME} Can not be recovered. (Not found : File backup) : ${LIST}"
+			fi
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U69() {
+	echo
+	#########################
+	echo "### PROCESS U69 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="nfs.service"
+
+	TARGET_LIST=/etc/exports
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				FUNCT_CHECK_SERVICE ${TARGET_SERVICE_LIST}
+				if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Please check if you need this service. (${TARGET_SERVICE_LIST})"
+
+					FUNCT_CHECK_FILE ${TARGET_LIST}
+					if [ ${CHECK_RESULT} -eq 0 ]
+					then 
+						FUNCT_CHECK_PERM ${TARGET_LIST}		
+						if [ "${CHECK_FILE_OWNER_VAL}" == "root" -a "${CHECK_FILE_PERM_VAL}" == "644" ]
+						then
+							echo "[INFO] ${HOSTNAME} This System is U-69 Check : OK (${TARGET_LIST})"
+						else
+							echo "[WARN] ${HOSTNAME} You need to change Permission 644 and Owner info root : ${TARGET_LIST}"
+							FUNCT_BACKUP_PERM ${TARGET_LIST}
+							echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chmod 644 ${TARGET_LIST} && chown root ${TARGET_LIST}"
+							chown root ${TARGET_LIST} 
+							chmod 644 ${TARGET_LIST} 
+						fi
+					else
+						echo "[CHECK] ${HOSTNAME} Not Found Target Config file. (${TARGET_LIST})"
+					fi
+				else
+					echo "[INFO] ${HOSTNAME} This System is U-69 Check : OK (Disable : ${TARGET_SERVICE_LIST})"	
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				FUNCT_CHECK_SERVICE ${TARGET_SERVICE_LIST}
+				if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Please check if you need this service. (${TARGET_SERVICE_LIST})"
+
+					FUNCT_CHECK_FILE ${TARGET_LIST}
+					if [ ${CHECK_RESULT} -eq 0 ]
+					then 
+						FUNCT_CHECK_PERM ${TARGET_LIST}		
+						if [ "${CHECK_FILE_OWNER_VAL}" == "root" -a "${CHECK_FILE_PERM_VAL}" == "644" ]
+						then
+							echo "[INFO] ${HOSTNAME} This System is U-69 Check : OK (${TARGET_LIST})"
+						else
+							echo "[WARN] ${HOSTNAME} You need to change Permission 644 and Owner info root : ${TARGET_LIST}"
+							FUNCT_BACKUP_PERM ${TARGET_LIST}
+							echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chmod 644 ${TARGET_LIST} && chown root ${TARGET_LIST}"
+							chown root ${TARGET_LIST} 
+							chmod 644 ${TARGET_LIST} 
+						fi
+					else
+						echo "[CHECK] ${HOSTNAME} Not Found Target Config file. (${TARGET_LIST})"
+					fi
+				else
+					echo "[INFO] ${HOSTNAME} This System is U-69 Check : OK (Disable : ${TARGET_SERVICE_LIST})"	
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		FUNCT_CHECK_PERM_BACKUP ${TARGET_LIST}
+		FUNCT_RESTORE_PERM ${TARGET_LIST} ALL
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -4220,8 +4367,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U32 ${WORK_TYPE}
 	FUNCT_U33 ${WORK_TYPE}
 	FUNCT_U34 ${WORK_TYPE}
-	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41
-	FUNCT_U42 ${WORK_TYPE}
+	FUNCT_U35 ${WORK_TYPE} ### Exception : MW (Middleware) diagnostic items. & with U36, U37, U38, U39, U40, U41, U71
+	#FUNCT_U42 ${WORK_TYPE}
 	FUNCT_U43 ${WORK_TYPE} ### Exception : You must manually check the log management policy.
 	FUNCT_U44 ${WORK_TYPE}
 	FUNCT_U45 ${WORK_TYPE}
@@ -4246,6 +4393,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U65 ${WORK_TYPE}
 	FUNCT_U66 ${WORK_TYPE}
 	FUNCT_U67 ${WORK_TYPE}
+	FUNCT_U68 ${WORK_TYPE}
+	FUNCT_U69 ${WORK_TYPE}
 }
 
 ##############################################################################
