@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=0.9.20250411
+SCRIPT_VERSION=0.9.20250414
 
 export LANG=C
 export LC_ALL=C
@@ -3568,6 +3568,9 @@ EX_LIST="
 .vim
 .viminfo
 .aws
+.rhosts
+.pwd.lock
+.updated
 .minio
 .minio.sys
 "
@@ -3911,6 +3914,111 @@ FUNCT_U64() {
 	fi
 }
 
+FUNCT_U65() {
+	echo
+	#########################
+	echo "### PROCESS U65 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="atd.service"
+
+	PERM_640_LIST="
+	/etc/at.allow
+	/etc/at.deny
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				FUNCT_CHECK_SERVICE ${TARGET_SERVICE_LIST}
+				if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Please check if you need this service. (${TARGET_SERVICE_LIST})"
+					for TARGET_LIST in ${PERM_640_LIST}
+					do
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then 
+							FUNCT_CHECK_PERM ${TARGET_LIST}		
+							if [ "${CHECK_FILE_OWNER_VAL}" == "root" -a "${CHECK_FILE_PERM_VAL}" == "640" ]
+							then
+								echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (${TARGET_LIST})"
+							else
+								echo "[WARN] ${HOSTNAME} You need to change Permission 640 and Owner info root : ${TARGET_LIST}"
+								FUNCT_BACKUP_PERM ${TARGET_LIST}
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chmod 640 ${TARGET_LIST} && chown root ${TARGET_LIST}"
+								chown root ${TARGET_LIST} 
+								chmod 640 ${TARGET_LIST} 
+							fi
+						else
+							echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (${TARGET_LIST})"
+						fi
+					done
+				else
+					echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (Disable : ${TARGET_SERVICE_LIST})"	
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				FUNCT_CHECK_SERVICE ${TARGET_SERVICE_LIST}
+				if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+				then
+					echo "[WARN] ${HOSTNAME} Please check if you need this service. (${TARGET_SERVICE_LIST})"
+					for TARGET_LIST in ${PERM_640_LIST}
+					do
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then 
+							FUNCT_CHECK_PERM ${TARGET_LIST}		
+							if [ "${CHECK_FILE_OWNER_VAL}" == "root" -a "${CHECK_FILE_PERM_VAL}" == "640" ]
+							then
+								echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (${TARGET_LIST})"
+							else
+								echo "[WARN] ${HOSTNAME} You need to change Permission 640 and Owner info root : ${TARGET_LIST}"
+								FUNCT_BACKUP_PERM ${TARGET_LIST}
+								echo "[INFO] ${HOSTNAME} Processing RECOMMEND Option : chmod 640 ${TARGET_LIST} && chown root ${TARGET_LIST}"
+								chown root ${TARGET_LIST} 
+								chmod 640 ${TARGET_LIST} 
+							fi
+						else
+							echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (${TARGET_LIST})"
+						fi
+					done
+				else
+					echo "[INFO] ${HOSTNAME} This System is U-65 Check : OK (Disable : ${TARGET_SERVICE_LIST})"	
+				fi
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		for TARGET_LIST in ${PERM_640_LIST}
+		do
+			FUNCT_CHECK_PERM_BACKUP ${TARGET_LIST}
+			FUNCT_RESTORE_PERM ${TARGET_LIST} ALL
+		done
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -3972,6 +4080,7 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U62 ${WORK_TYPE}
 	FUNCT_U63 ${WORK_TYPE}
 	FUNCT_U64 ${WORK_TYPE}
+	FUNCT_U65 ${WORK_TYPE}
 }
 
 ##############################################################################
