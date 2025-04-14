@@ -1,5 +1,6 @@
 #!/bin/bash
-#Script by helperchoi@gmail.com
+#Script by helperchoi@gmail.com / Kwang Min Choi
+#This script supports RHEL 7.x, Ubuntu 18.04 LTS and later systemd-based OS.
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
 SCRIPT_VERSION=0.9.20250414
 
@@ -4019,6 +4020,168 @@ FUNCT_U65() {
 	fi
 }
 
+FUNCT_U66() {
+	echo
+	#########################
+	echo "### PROCESS U66 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_SERVICE_LIST="
+	snmpd.service
+	snmptrapd.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[WARN] ${HOSTNAME} Please check if you need this service. (${LIST})"	
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-66 Check : OK (Disable : ${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[WARN] ${HOSTNAME} Please check if you need this service. (${LIST})"	
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-66 Check : OK (Disable : ${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U66."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
+FUNCT_U67() {
+	echo
+	#########################
+	echo "### PROCESS U67 ###"
+	#########################
+
+	WORK_TYPE=$1
+
+	TARGET_LIST=/etc/snmp/snmpd.conf
+
+	TARGET_SERVICE_LIST="
+	snmpd.service
+	snmptrapd.service
+	"
+
+	if [ ${WORK_TYPE} == "PROC" ]
+	then
+		if [ ${OS_PLATFORM} = "UBUNTU" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 18.04
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[WARN] ${HOSTNAME} Please check if you need this service. (${LIST})"	
+
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							CHECK_COMMUNITY=`grep "^com2sec" ${TARGET_LIST} | awk '{print $NF}'`
+
+							if [ "${CHECK_COMMUNITY}" == "public" -o "${CHECK_COMMUNITY}" == "private" ]
+							then
+								echo "[WARN] ${HOSTNAME} You need to change SNMP Community name. (${TARGET_LIST} : ${CHECK_COMMUNITY})"
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-67 Check : OK (${TARGET_LIST})"
+							fi
+						else
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-67 Check."
+						fi
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-67 Check : OK (Disable : ${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+
+		elif [ ${OS_PLATFORM} = "RHEL" ]
+		then
+			FUNCT_CHECK_COMPARE ${OS_VERSION} 7
+			if [ ${CHECK_COMPARE_RESULT} -eq 0 ]
+			then
+				for LIST in ${TARGET_SERVICE_LIST}
+				do
+					FUNCT_CHECK_SERVICE ${LIST}
+					if [ ${CHECK_SERVICE_RESULT} -eq 0 ]
+					then
+						echo "[WARN] ${HOSTNAME} Please check if you need this service. (${LIST})"	
+
+						FUNCT_CHECK_FILE ${TARGET_LIST}
+						if [ ${CHECK_RESULT} -eq 0 ]
+						then
+							CHECK_COMMUNITY=`grep "^com2sec" ${TARGET_LIST} | awk '{print $NF}'`
+
+							if [ "${CHECK_COMMUNITY}" == "public" -o "${CHECK_COMMUNITY}" == "private" ]
+							then
+								echo "[WARN] ${HOSTNAME} You need to change SNMP Community name. (${TARGET_LIST} : ${CHECK_COMMUNITY})"
+							else
+								echo "[INFO] ${HOSTNAME} This System is U-67 Check : OK (${TARGET_LIST})"
+							fi
+						else
+							echo "[CHECK] ${HOSTNAME} Not Found Target Config file (${TARGET_LIST}) & U-67 Check."
+						fi
+					else
+						echo "[INFO] ${HOSTNAME} This System is U-67 Check : OK (Disable : ${LIST})"	
+					fi
+				done
+			else
+				echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+			fi
+		else
+			echo "[CHECK] ${HOSTNAME} This script supports RHEL 7.x, Ubuntu 18.04 and later systemd-based OS."
+		fi
+
+	elif [ ${WORK_TYPE} == "RESTORE" ]
+	then
+		echo "[INFO] ${HOSTNAME} Not support recovery option for Function U67."
+	else
+		echo "[ERROR] ${HOSTNAME} Input Work type is Only PROC or RESTORE"
+		exit 1
+	fi
+}
+
 
 FUNCT_MAIN_PROCESS() {
 	WORK_TYPE=$1
@@ -4081,6 +4244,8 @@ FUNCT_MAIN_PROCESS() {
 	FUNCT_U63 ${WORK_TYPE}
 	FUNCT_U64 ${WORK_TYPE}
 	FUNCT_U65 ${WORK_TYPE}
+	FUNCT_U66 ${WORK_TYPE}
+	FUNCT_U67 ${WORK_TYPE}
 }
 
 ##############################################################################
