@@ -9,7 +9,7 @@
 (공통 모듈 25개를 포함한 총 85개 이상 각 기능별로 분리된 Logic Function화)
 ![image](https://github.com/user-attachments/assets/74d4102e-ba6c-45eb-9a38-23a790499eb3)
   
-4. **25년 4월 14일자 기준 72개 취약점 항목에 대해서 자동화 조치 구현 완료** (단 MW 진단항목 U35, U36, U37, U38, U39, U40, U41, U71 8개는 예외 처리중이며 추후 구현예정)  
+4. **25년 4월 14일자 Script Version 1.0 기준 72개 취약점 항목에 대해서 자동화 조치 구현 완료** (단 MW 진단항목 U35, U36, U37, U38, U39, U40, U41, U71 8개는 예외 처리중이며 추후 구현예정)  
 5. 실제 Script 실행전 KISA Link 문서 확인을 통해 아래 예시와 같이 실행 환경 특성에 맞게 예외처리가 필요한 항목들을 반드시 확인 후 실행하는 것을 권장 합니다. 
   
 (예 : k8s, docker 등 Container 환경에서 사용되는 OverlayFS 영역등에 적재되는 File 권한은 기본적으로 Container OS에 종속된 계정 UID/GID 값을 기준으로 생성되기 때문에 Woker Node등 Host OS에서는 소유주가 없는 파일로 인식됨.  
