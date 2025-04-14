@@ -6,7 +6,9 @@
 (단, 해당 스크립트의 사용 중 발생 또는 확인된 오류에 대해서 제보, 공유해 주시면 적극적으로 수정 및 반영토록 노력하겠습니다. helperchoi@gmail.com / Kwang Min Choi )
 2. Redhat 계열( Centos, Rocky, RHEL, OEL 등 ) 7.x 이상, Ubuntu 18.04 LTS 이상 Systemd 기반 환경에서만 동작토록 구현되어있으며, 이미 EOL 된지 오래된 xinetd 기반 Linux 환경에서는 동작하지 않거나, 정상적인 실행이 어렵습니다.
 3. 모든 처리 Logic은 각 기능별로 Function 화 구현되어 있어, 재사용, 분리, 실행 예외 처리 가능합니다.  
-(공통 모듈 25개를 포함한 총 85개 이상 각 기능별로 분리된 Logic Function화)     
+(공통 모듈 25개를 포함한 총 85개 이상 각 기능별로 분리된 Logic Function화)
+![image](https://github.com/user-attachments/assets/74d4102e-ba6c-45eb-9a38-23a790499eb3)
+  
 4. **25년 4월 14일자 기준 72개 취약점 항목에 대해서 자동화 조치 구현 완료** (단 MW 진단항목 U35, U36, U37, U38, U39, U40, U41, U71 8개는 예외 처리중이며 추후 구현예정)  
 5. 실제 Script 실행전 KISA Link 문서 확인을 통해 아래 예시와 같이 실행 환경 특성에 맞게 예외처리가 필요한 항목들을 반드시 확인 후 실행하는 것을 권장 합니다. 
   
