@@ -2,7 +2,7 @@
 #Script by helperchoi@gmail.com / Kwang Min Choi
 #This script supports RHEL 7.x, Ubuntu 18.04 LTS and later systemd-based OS.
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=1.0.20250414
+SCRIPT_VERSION=1.1.20250418
 
 export LANG=C
 export LC_ALL=C
@@ -11,12 +11,14 @@ WORK_TYPE=$1
 readonly DATE_TIME=`date '+%Y%m%d_%H%M%S'`
 LOG_DIR=/root/shell/KISA_SECURITY/logs
 CVE_RESULT_LOG=/tmp/cve_result.log
+BACKUP_ROOT_PATH=/root/shell/CONF_BACKUP
+BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP/${DATE_TIME}
+BACKUP_SERVICE_DIR=${BACKUP_ROOT_DIR}/service
+BACKUP_PERMISSION_DIR=${BACKUP_ROOT_DIR}/permission
+
 COMMON_VARS_DIR=/root/shell/KISA_SECURITY
 COMMON_VARS=${COMMON_VARS_DIR}/common
-BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP
-BACKUP_SERVICE_DIR=/root/shell/CONF_BACKUP/service
-BACKUP_PERMISSION_DIR=/root/shell/CONF_BACKUP/permission
-mkdir -p ${LOG_DIR} ${COMMON_VARS_DIR} ${BACKUP_ROOT_DIR} ${BACKUP_SERVICE_DIR} ${BACKUP_PERMISSION_DIR}
+mkdir -p ${LOG_DIR} ${COMMON_VARS_DIR} 
 
 #############################
 ###### COMMON FUNCTION ######
@@ -70,6 +72,42 @@ FUNCT_CHECK_COMPARE() {
 	fi
 }
 
+FUNCT_CHECK_BACKUP_DIR_LIST() {
+	echo
+	echo "########################################################"
+	echo "[INFO] The Backup List for this System is as follows."
+	echo "########################################################"
+	echo
+	
+	BACKUP_DIR_LIST=`find ${BACKUP_ROOT_PATH} -regextype posix-extended -mindepth 1 -maxdepth 1 -type d -regex '.*/[0-9]{8}_[0-9]{6}'`
+
+	for LIST in ${BACKUP_DIR_LIST}
+	do
+		basename ${LIST}
+	done
+	echo
+	echo "########################################################"
+	echo
+	echo "[QUESTION] Please Select the Recovery Point."
+	echo
+	read ANSWER_R
+
+	if [ -d "${BACKUP_ROOT_PATH}/${ANSWER_R}" ]
+	then
+		echo
+		echo "[INFO] You selected Restore Point : ${ANSWER_R}"
+		export BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP/${ANSWER_R}
+		export BACKUP_SERVICE_DIR=${BACKUP_ROOT_DIR}/service
+		export BACKUP_PERMISSION_DIR=${BACKUP_ROOT_DIR}/permission
+		echo "[INFO] BACKUP DIR : ${BACKUP_ROOT_DIR}"
+	else
+		echo
+		echo "[ERRROR] Please Select from the Backup List displayed and enter your information."
+		echo
+		exit 1
+	fi
+}
+
 FUNCT_MANDATORY() {
 	if [ "${USER}" != "root" ]
 	then
@@ -109,11 +147,16 @@ FUNCT_MANDATORY() {
 
 	elif [ $# -eq 1 ]
 	then
-		if [ ${WORK_TYPE} == "PROC" -o ${WORK_TYPE} == "RESTORE" ]
+		if [ ${WORK_TYPE} == "PROC" ]
 		then
 			export CHECK_WORK_TYPE=0
-		else
+
+		elif [  ${WORK_TYPE} == "RESTORE" ]
+		then
 			export CHECK_WORK_TYPE=1
+			FUNCT_CHECK_BACKUP_DIR_LIST
+		else
+			export CHECK_WORK_TYPE=2
 
 			echo
 			echo "### 1. Input Work Type : Only PROC or RESTORE ###"
@@ -813,7 +856,7 @@ FUNCT_U06() {
 		PROGRESS_PID=$!
 
 		TARGET_LIST=${BACKUP_ROOT_DIR}/NONE_USER_LIST
-		find / ! \( \( -path '/proc' -o -path '/root/shell/CONF_BACKUP' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/app/data/kubelet' \) -prune \) -type f -a -nouser -exec ls -a1Ld {} \; > ${TARGET_LIST}
+		find / ! \( \( -path '/proc' -o -path '${BACKUP_ROOT_DIR}' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/app/data/kubelet' \) -prune \) -type f -a -nouser -exec ls -a1Ld {} \; > ${TARGET_LIST}
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
@@ -1229,7 +1272,7 @@ FUNCT_U15() {
 		PROGRESS_PID=$!
 
 		TARGET_LIST=${BACKUP_ROOT_DIR}/WORLD_WRITABLE_LIST
-		find / ! \( \( -path '/proc' -o -path '/root/shell/CONF_BACKUP' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/sys' \) -prune \) -type f -perm -2 -exec ls -1 {} \; > ${TARGET_LIST}
+		find / ! \( \( -path '/proc' -o -path '${BACKUP_ROOT_DIR}' -o -path '/var/lib' -o -path '/run' -o -path '/run/containerd' -o -path '/sys' \) -prune \) -type f -perm -2 -exec ls -1 {} \; > ${TARGET_LIST}
 
 		CHECK_TARGET_OBJECT=`wc -l ${TARGET_LIST} | awk '{print $1}'`
 
@@ -3572,6 +3615,7 @@ EX_LIST="
 .rhosts
 .pwd.lock
 .updated
+.*.swp
 .minio
 .minio.sys
 "
@@ -4494,6 +4538,11 @@ read ANSWER
 
 if [ "${ANSWER}" == "y" -o "${ANSWER}" == "Y" ]
 then
+	if [ ${CHECK_WORK_TYPE} -eq 0 ]
+	then
+		mkdir -p ${BACKUP_ROOT_DIR} ${BACKUP_SERVICE_DIR} ${BACKUP_PERMISSION_DIR}
+	fi
+
 	FUNCT_MAIN_PROCESS ${WORK_TYPE} | tee ${LOG_DIR}/${DATE_TIME}_sec_std_conf.log
 	echo
 else
