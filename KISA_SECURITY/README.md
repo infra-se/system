@@ -98,15 +98,15 @@ https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md
 y
 
 ### PROCESS U01 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/ssh/sshd_config.20250310_092633
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/20250418_165910/etc/ssh/sshd_config.20250418_165910
 [INFO] centos01 Processing PermitRootLogin no : /etc/ssh/sshd_config
 
 ### PROCESS U02 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/security/pwquality.conf.20250310_092633
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/20250418_165910/etc/security/pwquality.conf.20250418_165910
 [INFO] centos01 Processing Password Quality : /etc/security/pwquality.conf
 
 ### PROCESS U03 ###
-[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/etc/pam.d/system-auth.20250310_092633
+[INFO] centos01 Backup Complete : /root/shell/CONF_BACKUP/20250418_165910/etc/pam.d/system-auth-ac.20250418_165910
 [INFO] centos01 Processing Password Lock : /etc/pam.d/system-auth
 
 ### PROCESS U04 ###
@@ -115,24 +115,30 @@ y
 ### PROCESS U05 ###
 [INFO] centos01 There is no problem with the PATH environment variable : OK
 
+### PROCESS U06 ###
+[-] Please wait. Progress ...
+
 ...  중략
 
-[root@centos01 CONF_BACKUP]#
+[root@centos01 CONF_BACKUP]# 
 [root@centos01 CONF_BACKUP]# pwd
 /root/shell/CONF_BACKUP
-[root@centos01 CONF_BACKUP]#
+[root@centos01 CONF_BACKUP]# 
 [root@centos01 CONF_BACKUP]# ll
 total 0
-drwxr-xr-x 5 root root 46 Mar  5 15:00 etc
--rw-r--r-- 1 root root  0 Mar  5 15:00 NONE_USER_LIST
-drwxr-xr-x 4 root root 28 Mar  5 15:00 permission
-drwxr-xr-x 2 root root  6 Mar  5 15:00 service
-[root@centos01 CONF_BACKUP]#
+drwxr-xr-x 5 root root  72 Apr 18 14:20 20250418_142050
+drwxr-xr-x 5 root root 128 Apr 18 14:23 20250418_142307
+drwxr-xr-x 5 root root 128 Apr 18 14:23 20250418_142316
+drwxr-xr-x 5 root root 128 Apr 18 14:23 20250418_142335
+drwxr-xr-x 5 root root 128 Apr 18 14:28 20250418_142803
+drwxr-xr-x 5 root root 128 Apr 18 16:59 20250418_165910
 [root@centos01 CONF_BACKUP]# 
+[root@centos01 CONF_BACKUP]# 
+
 ```
 
 4. 필요시 아래와 같이 RESTORE 옵션 입력을 통해 SCRIPT 수행 전 형상으로 자동 원복/복구 가능 합니다.  
-(2025.04.18. 반영된 버전 1.1 기준으로 시점복원 기능이 구현되어 있습니다. 원하는 복원 시점을 선택하여 입력하면 해당 시점으로 복원이 진행됩니다.)  
+(시점복원 기능이 구현되어 있습니다. 아래 예시와 같이 원하는 복원 시점을 선택하여 입력하시면 해당 시점으로 복원이 진행됩니다.)  
   
 ![image](https://github.com/user-attachments/assets/25b94059-7a88-49bc-9ac2-9313ccb46fd3)
 
