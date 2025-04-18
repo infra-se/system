@@ -69,7 +69,6 @@ Resolving deltas: 100% (333/333), done.
 ```
 3. 아래와 같이 Script 실행시 실행 (PROC) / 복구 (RESTORE) 옵션을 선택 입력하여 실행을 수행하며 (진단 및 조치 자동화)  
 취약점 조치 작업에 의한 시스템 이상 발생등, 유사시 작업전 형상으로 원복 및 복구를 위해 Script 실행시 기본적으로 관련 File 및 권한정보를 백업하도록 Logic화 되어있습니다.
-
 ```
 [root@centos01 KISA_SECURITY]# 
 [root@centos01 KISA_SECURITY]# ./sec_std_conf.sh 
@@ -127,80 +126,8 @@ drwxr-xr-x 2 root root  6 Mar  5 15:00 service
 ```
 
 4. 필요시 아래와 같이 RESTORE 옵션 입력을 통해 SCRIPT 수행 전 형상으로 자동 원복/복구 가능 합니다.  
-(현재는 가장 마지막 생성된 백업본을 기준으로 복구토록 구현되어 있으며, 추후 일자별 선택 복원기능 추가 예정.)
-```
-[root@centos01 KISA_SECURITY]# 
-[root@centos01 KISA_SECURITY]# 
-[root@centos01 KISA_SECURITY]# ./sec_std_conf.sh RESTORE
+(2025.04.18. 반영된 버전 1.1 기준으로 시점복원 기능이 구현되어 있습니다. 원하는 복원 시점을 선택하여 입력하면 해당 시점으로 복원이 진행됩니다.)  
+  
+![image](https://github.com/user-attachments/assets/25b94059-7a88-49bc-9ac2-9313ccb46fd3)
 
-[RECOMMEND] Be sure to read the guide document before running.
-https://github.com/infra-se/system/blob/main/KISA_SECURITY/README.md
-
-[QUESTION] Do you want run Script ? : y or n
-
-y
-
-### PROCESS U01 ###
-[INFO] centos01 Restore File : /root/shell/CONF_BACKUP/etc/ssh/sshd_config.20250305_150040 -> /etc/ssh/sshd_config
-
-### PROCESS U02 ###
-[INFO] centos01 Restore File : /root/shell/CONF_BACKUP/etc/security/pwquality.conf.20250305_150040 -> /etc/security/pwquality.conf
-
-### PROCESS U03 ###
-grep: /root/shell/CONF_BACKUP/etc/pam.d/system-auth.20250305_150040: No such file or directory
-[INFO] centos01 Restore File : /root/shell/CONF_BACKUP/etc/pam.d/system-auth.20250305_150040 -> /etc/pam.d/system-auth
-
-### PROCESS U04 ###
-[INFO] There is no recovery option for Function U04.
-
-### PROCESS U05 ###
-[INFO] There is no recovery option for Function U05.
-
-### PROCESS U06 ###
-[INFO] centos01 Backup File Not found.
-
-### PROCESS U08 ###
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/shadow.20250305_150040 [ 400:root:root ] -> /etc/shadow
-
-### PROCESS U09 ###
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/shadow.20250305_150040 [ 400:root:root ] -> /etc/shadow
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/passwd.20250305_150040 [ 644:root:root ] -> /etc/passwd
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/group.20250305_150040 [ 644:root:root ] -> /etc/group
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/services.20250305_150040 [ 644:root:root ] -> /etc/services
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/hosts.20250305_150040 [ 644:root:root ] -> /etc/hosts
-
-### PROCESS U11 ###
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/rsyslog.conf.20250305_150040 [ 640:root:root ] -> /etc/rsyslog.conf
-
-### PROCESS U13 ###
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/usr/sbin/unix_chkpwd.20250305_150040 [ 755:root:root ] -> /usr/sbin/unix_chkpwd
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/usr/bin/newgrp.20250305_150040 [ 755:root:root ] -> /usr/bin/newgrp
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /sbin/dump
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lpq-lpd
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /sbin/restore
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lpr
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/sbin/lpc
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lpr-lpd
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/sbin/lpc-lpd
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/usr/bin/at.20250305_150040 [ 755:root:root ] -> /usr/bin/at
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lprm
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/sbin/traceroute
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lpq
-[INFO] centos01 Can not Restore & Permission Backup File Not found : /usr/bin/lprm-lpd
-
-### PROCESS U14 ###
-[INFO] There is no recovery option for Function U14.
-
-### PROCESS U22 ###
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.d/0hourly.20250305_150040 [ 640:root:root ] -> /etc/cron.d/0hourly
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.d/raid-check.20250305_150040 [ 640:root:root ] -> /etc/cron.d/raid-check
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.d/sysstat.20250305_150040 [ 640:root:root ] -> /etc/cron.d/sysstat
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.daily/logrotate.20250305_150040 [ 640:root:root ] -> /etc/cron.daily/logrotate
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.daily/man-db.cron.20250305_150040 [ 640:root:root ] -> /etc/cron.daily/man-db.cron
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.daily/mlocate.20250305_150040 [ 640:root:root ] -> /etc/cron.daily/mlocate
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.deny.20250305_150040 [ 640:root:root ] -> /etc/cron.deny
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.hourly/0anacron.20250305_150040 [ 640:root:root ] -> /etc/cron.hourly/0anacron
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/cron.hourly/mcelog.cron.20250305_150040 [ 640:root:root ] -> /etc/cron.hourly/mcelog.cron
-[INFO] centos01 Restore Permission : /root/shell/CONF_BACKUP/permission/etc/crontab.20250305_150040 [ 640:root:root ] -> /etc/crontab
-```
 
