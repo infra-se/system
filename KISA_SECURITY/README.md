@@ -1,3 +1,9 @@
+## [ Release info ]  
+2025.04.18. Script Version 1.1 기준 시점복원 기능 구현이 완료 되었습니다.  
+1. 이제 Script 구동으로 인한 백업시 YYYYmmdd_HHMMSS 형식으로 Directory를 생성하여 백업 시점을 구분합니다.  
+2. Script 를 통한 Restore 수행시 시스템에 생성된 YYYYmmdd_HHMMSS 형식의 백업 Directory를 스캔하고, 확인된 백업 리스트를 사용자에게 알려줍니다.
+3. 사용자가 입력한 복원시점을 기준으로 복구를 수행을 합니다.  
+  
 ## [ 설명 ]
 이 Script는 KISA 한국인터넷진흥원에서 배포/관리하는 UNIX/LINUX 계열 OS 취약점 진단/조치 가이드 72개 항목에 대한 진단 및 조치를 자동화 수행하는 Script 입니다.  
 (https://www.kisa.or.kr/2060204/form?postSeq=12&lang_type=KO&page=1)  
