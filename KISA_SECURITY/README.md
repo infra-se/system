@@ -21,7 +21,7 @@
 (예 : k8s, docker 등 Container 환경에서 사용되는 OverlayFS 영역등에 적재되는 File 권한은 기본적으로 Container OS에 종속된 계정 UID/GID 값을 기준으로 생성되기 때문에 Woker Node등 Host OS에서는 소유주가 없는 파일로 인식됨.  
 따라서 U-06 취약점 항목과 같은 소유주가 없는 파일에 대한 식별 및 삭제 조치를 취하는 항목의 실행에 대해서는 신중을 기해야하며, 본 Script에서도 U-06 취약항목에 대해서는 직접 파일 삭제를 하지 않고, 내역 표기 및 경고처리를 하도록 Logic화 구현 되어있음.)  
   
-![image](https://github.com/user-attachments/assets/dc058820-49ac-413f-a789-d58f91e2121e)
+![image](https://github.com/user-attachments/assets/b13d8681-9384-4c73-a3c1-a42c32f3cc10)
   
 ![image](https://github.com/user-attachments/assets/ce4417ad-846d-4885-ae74-beca3d6eccd5)
   
