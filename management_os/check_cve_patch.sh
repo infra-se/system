@@ -1,13 +1,14 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Search CVE Patch Code"
-SCRIPT_VER=0.1.20250422
+SCRIPT_VER=0.2.20250422
 
 export LANG=C
 export LC_ALL=C
 
 VAR_CVE_CODE="CVE-2024-53150 CVE-2024-53197"
 PATTERN=$(echo "${VAR_CVE_CODE}" | sed 's/ /|/g')
+CVE_COUNT=$(echo "${VAR_CVE_CODE}" | wc -w)
 
 FUNCT_CHECK_OS() {
 	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
@@ -74,7 +75,7 @@ kill ${PROGRESS_PID}
 wait ${PROGRESS_PID} 2>/dev/null
 echo 
 
-if [ ${CHECK_CVE} -lt 2 ]
+if [ "${CHECK_CVE}" -lt "${CVE_COUNT}" ]
 then
 	echo "${HOSTNAME} | [ WARN ] Not Patched. (${VAR_CVE_CODE})"
 else
