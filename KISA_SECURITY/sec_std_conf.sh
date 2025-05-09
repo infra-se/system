@@ -2,7 +2,7 @@
 #Script by helperchoi@gmail.com / Kwang Min Choi
 #This script supports RHEL 7.x, Ubuntu 18.04 LTS and later systemd-based OS.
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=1.1.20250418
+SCRIPT_VERSION=1.1.20250509
 
 export LANG=C
 export LC_ALL=C
@@ -12,7 +12,7 @@ readonly DATE_TIME=`date '+%Y%m%d_%H%M%S'`
 LOG_DIR=/root/shell/KISA_SECURITY/logs
 CVE_RESULT_LOG=/tmp/cve_result.log
 BACKUP_ROOT_PATH=/root/shell/CONF_BACKUP
-BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP/${DATE_TIME}
+BACKUP_ROOT_DIR=${BACKUP_ROOT_PATH}/${DATE_TIME}
 BACKUP_SERVICE_DIR=${BACKUP_ROOT_DIR}/service
 BACKUP_PERMISSION_DIR=${BACKUP_ROOT_DIR}/permission
 
@@ -96,7 +96,7 @@ FUNCT_CHECK_BACKUP_DIR_LIST() {
 	then
 		echo
 		echo "[INFO] You selected Restore Point : ${ANSWER_R}"
-		export BACKUP_ROOT_DIR=/root/shell/CONF_BACKUP/${ANSWER_R}
+		export BACKUP_ROOT_DIR=${BACKUP_ROOT_PATH}/${ANSWER_R}
 		export BACKUP_SERVICE_DIR=${BACKUP_ROOT_DIR}/service
 		export BACKUP_PERMISSION_DIR=${BACKUP_ROOT_DIR}/permission
 		echo "[INFO] BACKUP DIR : ${BACKUP_ROOT_DIR}"
@@ -515,10 +515,10 @@ FUNCT_SEARCH_CVE() {
 	do
 		if [ ${OS_PLATFORM} == "RHEL" ]
 		then
-			rpm -qi ${LIST} --changelog | grep -o "CVE-[0-9]\{4\}-[0-9]\{4\}"
+			rpm -qi ${LIST} --changelog | grep -o "CVE-[0-9]\{4\}-[0-9]\{4,5\}"
 		elif [ ${OS_PLATFORM} == "UBUNTU" ]
 		then
-			zgrep -i "cve-" ${LIST} | grep -o "CVE-[0-9]\{4\}-[0-9]\{4\}"
+			zgrep -i "cve-" ${LIST} | grep -o "CVE-[0-9]\{4\}-[0-9]\{4,5\}"
 		fi
 	done
 
