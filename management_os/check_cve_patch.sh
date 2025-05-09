@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Search CVE Patch Code"
-SCRIPT_VER=0.3.20250425
+SCRIPT_VER=0.4.20250509
 
 export LANG=C
 export LC_ALL=C
@@ -124,7 +124,7 @@ kill ${PROGRESS_PID}
 wait ${PROGRESS_PID} 2>/dev/null
 echo 
 
-if [ "${CHECK_CVE}" -lt "${CVE_COUNT}" ]
+if [ "${CHECK_CVE}" -ne "${CVE_COUNT}" ]
 then
 	echo "${HOSTNAME} | [ WARN ] Not Patched. (${VAR_CVE_CODE})"
 else
