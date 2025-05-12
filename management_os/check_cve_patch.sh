@@ -6,9 +6,6 @@ SCRIPT_VER=0.5.20250512
 export LANG=C
 export LC_ALL=C
 
-declare -a ARRAY_PATCHED
-declare -a ARRAY_NOT_PATCHED
-
 VAR_CVE_CODE=$1
 TMP_RESULT=/tmp/cve.list
 
@@ -118,6 +115,8 @@ FUNCT_MANDATORY() {
 
 FUNCT_MAIN() {
 	VAR_CVE_CODE=$1
+	declare -a ARRAY_PATCHED
+	declare -a ARRAY_NOT_PATCHED
 
 	for LIST in ${VAR_CVE_CODE}
 	do
