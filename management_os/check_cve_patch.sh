@@ -6,6 +6,9 @@ SCRIPT_VER=0.5.20250512
 export LANG=C
 export LC_ALL=C
 
+declare -a ARRAY_PATCHED
+declare -a ARRAY_NOT_PATCHED
+
 VAR_CVE_CODE=$1
 TMP_RESULT=/tmp/cve.list
 
@@ -122,11 +125,21 @@ FUNCT_MAIN() {
 
 		if [ ${CHECK_CVE_RESULT} -ne 0 ]
 		then
-			echo "${HOSTNAME} | [ OK ] Patched. (${LIST})"
+			ARRAY_PATCHED+=("${LIST}")
 		else
-			echo "${HOSTNAME} | [ WARN ] Not Patched. (${LIST})"
+			ARRAY_NOT_PATCHED+=("${LIST}")
 		fi
 	done
+
+	if [ ${#ARRAY_PATCHED[@]} -ne 0 ]
+	then
+		echo "${HOSTNAME} | [ OK ] Patched. (${ARRAY_PATCHED[@]})"
+	fi
+
+	if [ ${#ARRAY_NOT_PATCHED[@]} -ne 0 ]
+	then
+		echo "${HOSTNAME} | [ WARN ] Not Patched. (${ARRAY_NOT_PATCHED[@]})"
+	fi
 }
 
 FUNCT_MANDATORY
@@ -137,6 +150,7 @@ FUNCT_SEARCH_CVE > ${TMP_RESULT}
 
 kill ${PROGRESS_PID}
 wait ${PROGRESS_PID} 2>/dev/null
-echo 
 
+echo
 FUNCT_MAIN "${VAR_CVE_CODE}"
+echo
