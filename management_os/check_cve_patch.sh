@@ -1,14 +1,13 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Search CVE Patch Code"
-SCRIPT_VER=0.4.20250509
+SCRIPT_VER=0.5.20250512
 
 export LANG=C
 export LC_ALL=C
 
 VAR_CVE_CODE=$1
-PATTERN=$(echo "${VAR_CVE_CODE}" | sed 's/ /|/g')
-CVE_COUNT=$(echo "${VAR_CVE_CODE}" | wc -w)
+TMP_RESULT=/tmp/cve.list
 
 FUNCT_CHECK_OS() {
 	CHECK_OS=`uname -s | tr '[A-Z]' '[a-z]'`
@@ -114,19 +113,30 @@ FUNCT_MANDATORY() {
 
 }
 
+FUNCT_MAIN() {
+	VAR_CVE_CODE=$1
+
+	for LIST in ${VAR_CVE_CODE}
+	do
+		CHECK_CVE_RESULT=`grep "${LIST}" ${TMP_RESULT} | wc -l`
+
+		if [ ${CHECK_CVE_RESULT} -ne 0 ]
+		then
+			echo "${HOSTNAME} | [ OK ] Patched. (${LIST})"
+		else
+			echo "${HOSTNAME} | [ WARN ] Not Patched. (${LIST})"
+		fi
+	done
+}
+
 FUNCT_MANDATORY
 FUNCT_SHOW_PROGRESS &
 PROGRESS_PID=$!
 
-CHECK_CVE=`FUNCT_SEARCH_CVE | egrep "${PATTERN}" | sort -u | wc -l` 
+FUNCT_SEARCH_CVE > ${TMP_RESULT}
 
 kill ${PROGRESS_PID}
 wait ${PROGRESS_PID} 2>/dev/null
 echo 
 
-if [ "${CHECK_CVE}" -ne "${CVE_COUNT}" ]
-then
-	echo "${HOSTNAME} | [ WARN ] Not Patched. (${VAR_CVE_CODE})"
-else
-	echo "${HOSTNAME} | [ OK ] Patched. (${VAR_CVE_CODE})"
-fi
+FUNCT_MAIN "${VAR_CVE_CODE}"
