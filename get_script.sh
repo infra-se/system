@@ -16,6 +16,7 @@ FUNCT_CHECK_OS() {
 			ubuntu) OS_PLATFORM="UBUNTU" ;;
 			rocky) OS_PLATFORM="RHEL" ;;
 			centos) OS_PLATFORM="RHEL" ;;
+   			rhel) OS_PLATFORM="RHEL" ;;
 			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
 		esac
 
