@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com ( Kwang Min Choi / Aiden )
 SCRIPT_DESCRIPTION="Get KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VER=0.5.20250324
+SCRIPT_VER=0.6.20250703
 
 export LANG=C
 export LC_ALL=C
@@ -16,6 +16,7 @@ FUNCT_CHECK_OS() {
 			ubuntu) OS_PLATFORM="UBUNTU" ;;
 			rocky) OS_PLATFORM="RHEL" ;;
 			centos) OS_PLATFORM="RHEL" ;;
+   			rhel) OS_PLATFORM="RHEL" ;;
 			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
 		esac
 
