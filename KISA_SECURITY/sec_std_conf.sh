@@ -2,7 +2,7 @@
 #Script by helperchoi@gmail.com / Kwang Min Choi
 #This script supports RHEL 7.x, Ubuntu 18.04 LTS and later systemd-based OS.
 SCRIPT_DESCRIPTION="KISA Vulnerability Diagnosis Automation Script"
-SCRIPT_VERSION=1.1.20250509
+SCRIPT_VERSION=1.2.20250703
 
 export LANG=C
 export LC_ALL=C
@@ -34,6 +34,7 @@ FUNCT_CHECK_OS() {
 			ubuntu) OS_PLATFORM="UBUNTU" ;;
 			rocky) OS_PLATFORM="RHEL" ;;
 			centos) OS_PLATFORM="RHEL" ;;
+   			rhel) OS_PLATFORM="RHEL" ;;
 			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
 		esac
 
