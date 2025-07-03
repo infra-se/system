@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Ansible Script Initialize"
-SCRIPT_VER=0.7.20250324
+SCRIPT_VER=0.8.20250703
 WORK_PATH=/home/${USER}/ANSIBLE_SCRIPT
 
 export LANG=C
@@ -17,6 +17,7 @@ FUNCT_CHECK_OS() {
 			ubuntu) OS_PLATFORM="UBUNTU" ;;
 			rocky) OS_PLATFORM="RHEL" ;;
 			centos) OS_PLATFORM="RHEL" ;;
+   			rhel) OS_PLATFORM="RHEL" ;;
 			*) echo "[ERROR] ${HOSTNAME} Unsupported Linux"; exit 1 ;;
 		esac
 
