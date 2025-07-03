@@ -1,7 +1,7 @@
 #!/bin/bash
 #Script made by helperchoi@gmail.com
 SCRIPT_DESCRIPTION="Get System Managed Script"
-SCRIPT_VER=0.4.20250324
+SCRIPT_VER=0.5.20250703
 
 export LANG=C
 export LC_ALL=C
