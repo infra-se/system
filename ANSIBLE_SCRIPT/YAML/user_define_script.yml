@@ -6,8 +6,9 @@
   become: yes
   vars:
     ansible_account: "{{ vars_ansible_account }}"
-    src_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/USER_DEFINE_SCRIPT
+    src_path: /root/shell/ANSIBLE_SCRIPT/USER_DEFINE_SCRIPT
     dst_path: /home/{{ ansible_account }}/ANSIBLE_SCRIPT/USER_DEFINE_SCRIPT
+    common_file: auditbeat.yml
     run_script: "{{ vars_run_script }}"
 
   tasks:
@@ -21,6 +22,9 @@
 
     - name: Deploy Main Script
       copy: src={{src_path}}/{{ run_script }} dest={{dst_path}}/{{ run_script }} mode=755 owner=root force=yes
+
+    - name: Deploy Common File
+      copy: src={{src_path}}/{{common_file}} dest={{dst_path}}/{{common_file}} mode=600 owner=root force=yes
 
     - name: Run Script
       shell: "{{dst_path}}/{{ run_script }}"
